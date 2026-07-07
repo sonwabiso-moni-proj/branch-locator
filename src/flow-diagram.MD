@@ -1,0 +1,126 @@
+┌───────────────┐
+│ User Opens    │
+│ BranchLocator │
+└───────┬───────┘
+        │
+        ▼
+┌──────────────────────┐
+│ Load All Branches    │
+│ GET /api/branches    │
+└───────┬──────────────┘
+        │
+        ▼
+┌──────────────────────┐
+│ Display Branch List  │
+└───┬───────────┬──────┘
+    │           │
+    ▼           ▼
+ Search      Filter
+    │           │
+    └─────┬─────┘
+          ▼
+ Update Branch List
+          │
+          ▼
+ Select Branch
+          │
+          ▼
+GET /api/branches/:id
+          │
+          ▼
+ Display Branch Details
+
+
+
+ ┌──────────────┐
+│ User Types   │
+│ Search Text  │
+└──────┬───────┘
+       │
+       ▼
+┌────────────────────┐
+│ Validate Input     │
+└──────┬─────────────┘
+       │
+       ▼
+┌────────────────────┐
+│ Search Branch List │
+└──────┬─────────────┘
+       │
+       ▼
+┌────────────────────┐
+│ Matching Branches  │
+└──────┬─────────────┘
+       │
+       ▼
+ Display Results
+
+
+ ┌─────────────────┐
+│ Select Branch   │
+└────────┬────────┘
+         │
+         ▼
+GET /api/branches/:id
+         │
+         ▼
+Validate with Zod
+         │
+         ▼
+Store Selected Branch
+         │
+         ▼
+Display
+├─ Header
+├─ Contact
+├─ Opening Hours
+├─ Services
+├─ Languages
+└─ Best Time
+
+
+
+┌──────────────┐
+│ Select Filter│
+└──────┬───────┘
+       │
+       ▼
+ATM?
+Open Now?
+Forex?
+       │
+       ▼
+GET /api/branches/filter
+       │
+       ▼
+Validate Response
+       │
+       ▼
+Display Filtered List
+
+
+┌──────────────────┐
+│ Click "Nearby"   │
+└────────┬─────────┘
+         │
+         ▼
+Request GPS Permission
+         │
+         ▼
+Permission Granted?
+    │
+ ┌──┴─────┐
+ │        │
+No       Yes
+ │        │
+ ▼        ▼
+Show     Get Location
+Error       │
+            ▼
+GET /api/branches/nearby
+            │
+            ▼
+Validate Response
+            │
+            ▼
+Display Nearby Branches
