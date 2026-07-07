@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Marker, Popup } from "react-leaflet";
 
-import { API_PATHS } from "../api/constants/api-paths";
+import { API_PATHS } from "../../api/constants/api-paths";
 
 export default function BranchMarker({ branch }) {
   const [branchDetails, setBranchDetails] = useState(null);

@@ -1,0 +1,41 @@
+.header{
+
+    background:linear-gradient(
+        180deg,
+        #f5f8fd 0%,
+        white 100%
+    );
+
+    border-bottom:1px solid #e5e7eb;
+
+    padding:60px 0;
+}
+
+.header-container{
+
+    width:90%;
+
+    max-width:800px;
+
+    margin:auto;
+}
+
+.header h1{
+
+    font-size:52px;
+
+    color:#1f2937;
+
+    margin-bottom:20px;
+}
+
+.header p{
+
+    font-size:20px;
+
+    line-height:1.8;
+
+    color:#64748b;
+
+    max-width:800px;
+}

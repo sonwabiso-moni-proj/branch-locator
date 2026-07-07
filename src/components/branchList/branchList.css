@@ -1,0 +1,94 @@
+.branch-list {
+
+    width: 35%;
+
+    height: 500px;
+
+    overflow-y: auto;
+
+    background: white;
+
+    border-radius: 16px;
+
+    border: 1px solid #e2e8f0;
+
+    box-shadow: 0 4px 18px rgba(0,0,0,.08);
+
+    padding: 20px;
+}
+
+.branch-list h2{
+
+    margin-top:0;
+
+    margin-bottom:20px;
+
+    color:#1e293b;
+}
+
+.branch-card{
+
+    padding:18px;
+
+    border:1px solid #e2e8f0;
+
+    border-radius:12px;
+
+    margin-bottom:15px;
+
+    cursor:pointer;
+
+    transition:.2s;
+}
+
+.branch-card:hover{
+
+    transform:translateY(-2px);
+
+    box-shadow:0 6px 18px rgba(0,0,0,.08);
+
+    border-color:#16a34a;
+}
+
+.branch-card h3{
+
+    margin:0 0 8px;
+
+    font-size:17px;
+
+    color:#0f172a;
+}
+
+.branch-card p{
+
+    margin:4px 0;
+
+    color:#64748b;
+
+    font-size:14px;
+}
+
+.branch-footer{
+
+    margin-top:12px;
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+}
+
+.status-open{
+
+    color:#16a34a;
+
+    font-weight:600;
+}
+
+.status-closed{
+
+    color:#dc2626;
+
+    font-weight:600;
+}

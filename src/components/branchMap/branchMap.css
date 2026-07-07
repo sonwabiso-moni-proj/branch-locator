@@ -1,0 +1,53 @@
+.branch-map {
+    width: 100%;
+    height: 650px;
+}
+
+.branch-map .leaflet-container {
+    width: 100%;
+    height: 100%;
+}
+
+.branch-map .leaflet-control-zoom {
+    border: none;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+}
+
+.branch-map .leaflet-control-zoom a {
+    width: 36px;
+    height: 36px;
+    line-height: 36px;
+}
+
+.branch-map .leaflet-popup-content-wrapper {
+    border-radius: 16px;
+}
+
+.branch-map .leaflet-popup-content {
+    margin: 16px;
+}
+
+.branch-map .leaflet-control-attribution {
+    font-size: 11px;
+}
+.branch-cluster {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: #00a651;
+    border: 4px solid white;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+
+    box-shadow: 0 4px 10px rgba(0,0,0,.25);
+}
+
+.branch-cluster span {
+    line-height: 1;
+}
