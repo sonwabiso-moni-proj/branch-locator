@@ -2306,6 +2306,23 @@ const branches = [
     notes: null,
   }];
 
+
+ function getDistanceInKm(lat1, lon1, lat2, lon2) {
+  const earthRadius = 6371;
+
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLon = ((lon2 - lon1) * Math.PI) / 180;
+
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLon / 2) ** 2;
+
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+  return Number((earthRadius * c).toFixed(1));
+}
 /* ------------------------------------------------------------------
    Branch Locator Mock Endpoints
 -------------------------------------------------------------------*/
@@ -2420,7 +2437,42 @@ export const branchLocatorService = [
       pageSize,
     });
   }),
+/**
+ * ------------------------------------------------------------------
+ * POST /v1/branches/search
+ * ------------------------------------------------------------------
+ */
+http.post(API_PATHS.BRANCH_SEARCH, async ({ request }) => {
+  await delay(500);
 
+  const body = await request.json();
+
+  const { latitude, longitude } = body.coordinates;
+
+  const nearestBranches = branches
+    .map((branch) => ({
+      id: branch.id,
+      name: branch.name,
+      province: branch.province,
+      coordinates: branch.coordinates,
+      address: `${branch.address.street}, ${branch.address.city}`,
+      rating: branch.rating,
+      isOpen: branch.isOpen,
+
+      distance: getDistanceInKm(
+        latitude,
+        longitude,
+        branch.coordinates.latitude,
+        branch.coordinates.longitude,
+      ),
+    }))
+    .sort((a, b) => a.distance - b.distance);
+
+  return HttpResponse.json({
+    success: true,
+    branches: nearestBranches,
+  });
+}),
   /**
    * ------------------------------------------------------------------
    * GET /v1/branches/:branchId

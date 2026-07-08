@@ -3,10 +3,12 @@ import { useEffect, useState } from "react";
 import "./App.css";
 
 import Header from "./components/Header/Header";
-import BranchMap from "./components/BranchMap/BranchMap";
 import BranchList from "./components/BranchList/BranchList";
+import BranchMap from "./components/BranchMap/BranchMap";
 
 import { API_PATHS } from "./api/constants/api-paths";
+import { branchApiService } from "./api/BranchApiService";
+
 
 export default function App() {
   const [search, setSearch] = useState("");
@@ -25,7 +27,6 @@ export default function App() {
         }
 
         const response = await fetch(url);
-
         const data = await response.json();
 
         if (data.success) {
@@ -41,32 +42,42 @@ export default function App() {
     loadBranches();
   }, [search]);
 
+async function handleLocationFound(coordinates) {
+  try {
+    setLoading(true);
+
+    const data = await branchApiService.searchNearbyBranches({
+      coordinates,
+    });
+
+    setBranches(data.branches);
+  } catch (error) {
+    console.error(error);
+  } finally {
+    setLoading(false);
+  }
+}
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="app">
+      <Header
+        onSearch={setSearch}
+        onLocationFound={handleLocationFound}
+      />
 
-      <Header onSearch={setSearch} />
-
-      <main className="max-w-7xl mx-auto px-6 py-10">
-
+      <main className="app-content">
         <div className="locator-layout">
-
           <BranchList
             branches={branches}
             loading={loading}
           />
 
           <div className="map-card">
-
             <BranchMap
               branches={branches}
             />
-
           </div>
-
         </div>
-
       </main>
-
     </div>
   );
 }

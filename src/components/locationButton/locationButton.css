@@ -1,0 +1,38 @@
+.location-button {
+
+    height: 46px;
+
+    padding: 0 20px;
+
+    border: 1px solid #d1d5db;
+
+    border-radius: 10px;
+
+    background: white;
+
+    color: #1f2937;
+
+    font-size: 15px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: all .2s ease;
+}
+
+.location-button:hover {
+
+    background: #00a651;
+
+    color: white;
+
+    border-color: #00a651;
+}
+
+.location-button:disabled {
+
+    opacity: .6;
+
+    cursor: not-allowed;
+}

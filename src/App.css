@@ -1,20 +1,41 @@
-.locator-layout {
-    display: flex;
-    gap: 24px;
-    align-items: stretch;
-}
+.app {
 
-.map-card {
-    flex: 1;
-    height: 650px;
+    width: 100%;
+
+    max-width: 1200px;
+
+    margin: 0 auto;
 
     background: white;
 
-    border-radius: 20px;
+    min-height: 100vh;
+}
 
-    overflow: hidden;
+.app-content{
 
-    border: 1px solid #e2e8f0;
+    padding:32px;
+}
 
-    box-shadow: 0 10px 30px rgba(0,0,0,.08);
+.locator-layout{
+
+    display:flex;
+
+    gap:24px;
+
+    align-items:stretch;
+}
+
+.map-card{
+
+    flex:1;
+
+    height:650px;
+
+    border-radius:20px;
+
+    overflow:hidden;
+
+    border:1px solid #e5e7eb;
+
+    box-shadow:0 10px 25px rgba(0,0,0,.08);
 }

@@ -1,15 +1,20 @@
-import { HttpService } from "../services/HttpService";
-import { API_PATHS } from "../constants/apiPaths";
+import { HttpService } from "./service/base/http-Service";
+import { API_PATHS } from "./constants/api-paths";
 
 import {
   GetBranchesRequestSchema,
   GetBranchesResponseSchema,
-} from "../schemas/branches/getBranches.schema";
+} from "./schemas/getBranches.schema";
 
 import {
   GetBranchByIdParamsSchema,
   GetBranchByIdResponseSchema,
-} from "../schemas/branches/getBranchById.schema";
+} from "./schemas/getBranchById.schema";
+
+import {
+  SearchNearbyBranchesRequestSchema,
+  SearchNearbyBranchesResponseSchema,
+} from "./schemas/searchNearbyBranches.schema";
 
 export class BranchApiService extends HttpService {
   async getBranches(searchParams = {}, opts) {
@@ -33,6 +38,17 @@ export class BranchApiService extends HttpService {
     return this.getValidated(
       `${API_PATHS.BRANCHES}/${branchId}`,
       GetBranchByIdResponseSchema,
+      opts,
+    );
+  }
+
+  async searchNearbyBranches(request, opts) {
+    const body = SearchNearbyBranchesRequestSchema.parse(request);
+
+    return this.postValidated(
+      API_PATHS.BRANCH_SEARCH,
+      body,
+      SearchNearbyBranchesResponseSchema,
       opts,
     );
   }
