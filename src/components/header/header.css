@@ -20,6 +20,18 @@
   margin: 0 auto;
 }
 
+.locator-logo-container {
+  display: flex;
+  align-items: center;
+  margin-bottom: 28px;
+}
+
+.locator-logo {
+  height: 100px;
+  width: auto;
+  object-fit: contain;
+}
+
 .locator-header-copy {
   max-width: 720px;
   margin-bottom: 22px;
@@ -241,7 +253,15 @@
 
 @media (max-width: 760px) {
   .locator-header {
-    padding: 24px 16px 18px;
+    padding: 20px 16px 18px;
+  }
+
+  .locator-logo {
+    height: 36px;
+  }
+
+  .locator-logo-container {
+    margin-bottom: 24px;
   }
 
   .locator-search-card {

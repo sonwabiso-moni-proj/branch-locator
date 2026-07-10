@@ -1,5 +1,6 @@
 import { useState } from "react";
 import "./Header.css";
+import logo from "../../assets/sentra_bank_logo.svg";
 
 const FILTER_OPTIONS = [
   {
@@ -85,6 +86,9 @@ export default function Header({
   return (
     <header className="locator-header">
       <div className="locator-header-content">
+        <div className="locator-logo-container">
+          <img src={logo} alt="Sentra Bank" className="locator-logo" />
+        </div>
         <div className="locator-header-copy">
           <span className="locator-eyebrow">Branch locator</span>
 

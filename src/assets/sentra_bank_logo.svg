@@ -1,0 +1,68 @@
+<svg width="900" height="260" viewBox="0 0 900 260" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Sentra Bank Logo</title>
+  <desc id="desc">A tech-savvy blue, red, and white logo for Sentra Bank with a shield, circuit lines, and bold wordmark.</desc>
+
+  <defs>
+    <linearGradient id="sentraBlue" x1="44" y1="22" x2="216" y2="218" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#061B4F"/>
+      <stop offset="0.55" stop-color="#004B93"/>
+      <stop offset="1" stop-color="#0072CE"/>
+    </linearGradient>
+
+    <linearGradient id="electricBlue" x1="70" y1="50" x2="205" y2="195" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0B5FFF"/>
+      <stop offset="1" stop-color="#003A70"/>
+    </linearGradient>
+
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="10" stdDeviation="10" flood-color="#061B4F" flood-opacity="0.18"/>
+    </filter>
+  </defs>
+
+  <!-- Icon -->
+  <g filter="url(#softShadow)">
+    <!-- Main shield -->
+    <path d="M130 20L220 70V142C220 182 185 213 130 236C75 213 40 182 40 142V70L130 20Z" fill="url(#sentraBlue)"/>
+
+    <!-- Right angular tech panel -->
+    <path d="M130 20L220 70V142C220 178 190 207 142 230V126L130 20Z" fill="#0B5FFF" opacity="0.7"/>
+
+    <!-- Inner white shield line -->
+    <path d="M130 43L197 81V140C197 168 174 191 130 212C86 191 63 168 63 140V81L130 43Z" stroke="#FFFFFF" stroke-width="8" stroke-linejoin="round"/>
+
+    <!-- Sentinel eye -->
+    <path d="M75 116C92 91 111 81 130 81C149 81 168 91 185 116C168 141 149 151 130 151C111 151 92 141 75 116Z" fill="#FFFFFF"/>
+    <path d="M86 116C99 99 114 91 130 91C146 91 161 99 174 116C161 133 146 141 130 141C114 141 99 133 86 116Z" fill="#061B4F"/>
+    <circle cx="130" cy="116" r="26" fill="url(#electricBlue)"/>
+    <circle cx="130" cy="116" r="11" fill="#061B4F"/>
+    <circle cx="140" cy="105" r="5" fill="#FFFFFF"/>
+
+    <!-- Circuit lines left -->
+    <path d="M78 155H98V180" stroke="#FFFFFF" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M98 180H114" stroke="#FFFFFF" stroke-width="7" stroke-linecap="round"/>
+    <circle cx="78" cy="155" r="9" fill="#061B4F" stroke="#FFFFFF" stroke-width="6"/>
+    <circle cx="114" cy="180" r="9" fill="#061B4F" stroke="#FFFFFF" stroke-width="6"/>
+
+    <!-- Growth bars right -->
+    <rect x="151" y="164" width="13" height="34" rx="3" fill="#FFFFFF"/>
+    <rect x="171" y="145" width="13" height="53" rx="3" fill="#FFFFFF"/>
+    <rect x="191" y="125" width="13" height="73" rx="3" fill="#FFFFFF"/>
+
+    <!-- Red sharp accent -->
+    <path d="M84 226L130 249L176 226L130 237L84 226Z" fill="#E31837"/>
+  </g>
+
+  <!-- Wordmark -->
+  <g>
+    <text x="270" y="129" fill="#061B4F" font-family="Inter, Montserrat, Arial, sans-serif" font-size="74" font-weight="900" letter-spacing="-2">
+      Sentra
+    </text>
+    <text x="270" y="194" fill="#0B5FFF" font-family="Inter, Montserrat, Arial, sans-serif" font-size="74" font-weight="900" letter-spacing="-2">
+      Bank
+    </text>
+
+    <!-- Red underline accent -->
+    <path d="M274 211H494" stroke="#E31837" stroke-width="8" stroke-linecap="round"/>
+    <path d="M510 211H565" stroke="#061B4F" stroke-width="8" stroke-linecap="round" opacity="0.25"/>
+  </g>
+</svg>
