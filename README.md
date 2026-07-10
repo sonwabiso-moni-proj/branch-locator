@@ -4,11 +4,15 @@ A React web application that lets users find Sentra Bank branches and ATMs acros
 
 ## Features
 
+- **Branding** — Sentra Bank logo prominently displayed at the top of the header
 - **Interactive map** — powered by Leaflet with marker clustering for dense areas
 - **Search** — filter branches by name, suburb, city, or province
 - **Filter tabs** — quickly narrow results by ATM, Cash Accepting ATM, Smart ID Services, or Business Banking Centre
 - **"Near me" location** — uses the browser Geolocation API to find the closest branches sorted by distance
 - **Branch list** — scrollable sidebar with open/closed status and address
+- **Get Directions** — click any branch marker to open OpenStreetMap directions in a new tab
+- **Request caching** — repeated searches return instantly from cache, reducing API calls
+- **Request deduplication** — rapid interactions cancel previous requests, preventing race conditions
 - **Mock API** — built-in MSW (Mock Service Worker) mock so the app runs fully offline without a real backend
 
 ## Tech stack
@@ -37,10 +41,15 @@ src/
 ├── components/
 │   ├── branchList/                # Scrollable branch results sidebar
 │   ├── branchMap/                 # Leaflet map with clustered markers
-│   ├── header/                    # Search bar, filter tabs, location button
+│   ├── header/                    # Search bar, filter tabs, location button, logo
 │   └── locationButton/            # "Near me" geolocation trigger
+├── utils/
+│   ├── cache.js                   # Request caching & deduplication utilities
+│   └── directions.js              # OpenStreetMap directions URL generator
+├── assets/
+│   └── sentra_bank_logo.svg       # Sentra Bank logo
 ├── config/env.js                  # Feature flags (USE_MOCK_SERVICE)
-├── App.jsx                        # Root component — state & data fetching
+├── App.jsx                        # Root component — state & data fetching with caching
 └── main.jsx                       # Entry point — MSW bootstrap
 ```
 
@@ -119,8 +128,27 @@ export const USE_MOCK_SERVICE = false;
 | GET | `/v1/branches/:branchId` | Get a single branch by ID |
 | POST | `/v1/branches/search` | Find nearest branches by coordinates (`{ coordinates: { latitude, longitude } }`) |
 
+## Performance & Caching
+
+The app includes intelligent request caching and deduplication:
+
+- **Response caching** — Results are cached by endpoint + parameters. Repeated searches return instantly from memory.
+- **Request deduplication** — Only one request runs at a time. Rapid interactions cancel previous requests, preventing race conditions and wasted API calls.
+- **AbortController** — Pending requests are cancelled when new requests are initiated, ensuring fresh data always arrives.
+
+**Example:**
+```
+User searches "Cape Town"         → API call
+User searches "Cape Town" again   → Instant (cached)
+User changes filter               → Cancels previous, new API call
+```
+
 ## Mock API
 
 The mock is powered by [MSW](https://mswjs.io/) and runs entirely in the browser via a Service Worker. It includes 60 branches spread across all 9 South African provinces with realistic data (operating hours, facilities, services, busy times, ratings).
 
 To simulate API errors during development, append `?simulateError=400`, `?simulateError=500`, or `?simulateError=404` to any request URL.
+
+## Directions
+
+Users can click any branch marker on the map to view full details and click the **"Get Directions"** button. This opens [OpenStreetMap's routing service](https://www.openstreetmap.org/directions) in a new tab with the branch location as the destination. Users can enter their starting point on OpenStreetMap to see the route.
