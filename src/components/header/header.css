@@ -1,89 +1,273 @@
-.header{
-
-    background:linear-gradient(
-        180deg,
-        #f5f8fd 0%,
-        white 100%
-    );
-
-    border-bottom:1px solid #e5e7eb;
-
-    padding:60px 0;
+:root {
+  --capitec-blue: #004b93;
+  --capitec-dark-blue: #003a70;
+  --capitec-light-blue: #eaf3fb;
+  --capitec-red: #e31837;
+  --capitec-text: #111827;
+  --capitec-muted: #4b5563;
+  --capitec-border: #d1d5db;
 }
 
-.header-container{
-
-    width:90%;
-
-    max-width:800px;
-
-    margin:auto;
+.locator-header {
+  padding: 32px 24px 24px;
+  background:
+    radial-gradient(circle at top left, rgba(0, 75, 147, 0.16), transparent 34%),
+    linear-gradient(135deg, #f4f9ff 0%, #ffffff 55%, #eef6ff 100%);
 }
 
-.header h1{
-
-    font-size:52px;
-
-    color:#1f2937;
-
-    margin-bottom:20px;
+.locator-header-content {
+  max-width: 1180px;
+  margin: 0 auto;
 }
 
-.header p{
-
-    font-size:20px;
-
-    line-height:1.8;
-
-    color:#64748b;
-
-    max-width:800px;
-}
-.branch-filters {
-
-    display: flex;
-
-    align-items: center;
-
-    gap: 20px;
-
-    margin-top: 20px;
+.locator-header-copy {
+  max-width: 720px;
+  margin-bottom: 22px;
 }
 
-.filter-option {
-
-    display: flex;
-
-    align-items: center;
-
-    gap: 8px;
-
-    cursor: pointer;
-
-    font-size: 16px;
-
-    color: #1e293b;
-
-    user-select: none;
+.locator-header-copy::after {
+  content: "";
+  display: block;
+  width: 56px;
+  height: 4px;
+  margin-top: 18px;
+  border-radius: 999px;
+  background: var(--capitec-red);
 }
 
-.filter-option input {
-
-    width: 18px;
-
-    height: 18px;
-
-    cursor: pointer;
-
-    accent-color: #00a651;
+.locator-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  padding: 6px 12px;
+  margin-bottom: 12px;
+  border-radius: 999px;
+  background: rgba(0, 75, 147, 0.1);
+  color: var(--capitec-blue);
+  font-size: 13px;
+  font-weight: 700;
 }
-.header-actions {
 
-    display: flex;
+.locator-header h1 {
+  margin: 0;
+  color: var(--capitec-text);
+  font-size: clamp(30px, 5vw, 52px);
+  line-height: 1.05;
+  letter-spacing: -0.04em;
+}
 
-    gap: 16px;
+.locator-header p {
+  max-width: 620px;
+  margin: 14px 0 0;
+  color: var(--capitec-muted);
+  font-size: 16px;
+  line-height: 1.6;
+}
 
-    align-items: center;
+/* Search area */
+.locator-search-card {
+  display: flex;
+  align-items: flex-end;
+  gap: 14px;
+  max-width: 760px;
+  margin-top: 24px;
+}
 
-    margin-top: 24px;
+.locator-search-field {
+  flex: 1;
+  min-width: 0;
+}
+
+.locator-search-input-wrap {
+  display: flex;
+  align-items: center;
+  min-height: 56px;
+  padding: 0 16px;
+  border: 1px solid var(--capitec-border);
+  border-radius: 8px;
+  background: #ffffff;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.locator-search-input-wrap:focus-within {
+  border-color: var(--capitec-blue);
+  box-shadow: 0 0 0 3px rgba(0, 75, 147, 0.14);
+}
+
+.locator-search-input-wrap input {
+  width: 100%;
+  height: 52px;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--capitec-text);
+  font-size: 15px;
+}
+
+.locator-search-input-wrap input::placeholder {
+  color: #6b7280;
+}
+
+.locator-location-button {
+  height: 56px;
+  padding: 0 22px;
+  border: 2px solid var(--capitec-blue);
+  border-radius: 999px;
+  background: var(--capitec-blue);
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.locator-location-button:hover:not(:disabled) {
+  background: var(--capitec-dark-blue);
+  box-shadow: 0 8px 18px rgba(0, 75, 147, 0.22);
+  transform: translateY(-1px);
+}
+
+.locator-location-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* Tonal toggle filters */
+.locator-filter-section {
+  margin-top: 30px;
+}
+
+.locator-filter-section p {
+  margin: 0 0 12px;
+  color: var(--capitec-text);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.locator-toggle-scroll {
+  width: 100%;
+  overflow-x: auto;
+  padding-bottom: 6px;
+}
+
+.locator-toggle-scroll::-webkit-scrollbar {
+  height: 6px;
+}
+
+.locator-toggle-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.locator-toggle-scroll::-webkit-scrollbar-thumb {
+  background: rgba(0, 75, 147, 0.22);
+  border-radius: 999px;
+}
+
+.locator-toggle-group {
+  display: flex;
+  gap: 4px;
+  width: max-content;
+  max-width: 100%;
+  padding: 4px;
+  border-radius: 20px;
+  background: #dceefa;
+  border: 1px solid rgba(0, 75, 147, 0.16);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.6);
+}
+
+.locator-toggle-button {
+  min-width: 145px;
+  min-height: 72px;
+  padding: 13px 16px;
+  border: 1px solid transparent;
+  border-radius: 14px;
+  background: #f4f9ff;
+  color: var(--capitec-blue);
+  cursor: pointer;
+  text-align: left;
+  box-shadow: inset 0 0 0 1px rgba(0, 75, 147, 0.08);
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+.locator-toggle-button:hover {
+  background: #ffffff;
+  border-color: rgba(0, 75, 147, 0.22);
+  box-shadow: 0 8px 18px rgba(0, 75, 147, 0.12);
+  transform: translateY(-1px);
+}
+
+.locator-toggle-button-active {
+  background: var(--capitec-blue);
+  color: #ffffff;
+  border-color: var(--capitec-blue);
+  box-shadow: 0 10px 22px rgba(0, 75, 147, 0.26);
+}
+
+.locator-toggle-button-active:hover {
+  background: var(--capitec-dark-blue);
+  border-color: var(--capitec-dark-blue);
+}
+
+.locator-toggle-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.locator-toggle-description {
+  display: block;
+  margin-top: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.25;
+  opacity: 0.82;
+}
+
+.locator-toggle-button-active .locator-toggle-description {
+  opacity: 0.9;
+}
+
+@media (max-width: 760px) {
+  .locator-header {
+    padding: 24px 16px 18px;
+  }
+
+  .locator-search-card {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .locator-location-button {
+    width: 100%;
+  }
+
+  .locator-toggle-group {
+    max-width: none;
+  }
+
+  .locator-toggle-button {
+    min-width: 138px;
+    min-height: 66px;
+    padding: 11px 14px;
+  }
+
+  .locator-toggle-label {
+    font-size: 13px;
+  }
+
+  .locator-toggle-description {
+    font-size: 11px;
+  }
 }

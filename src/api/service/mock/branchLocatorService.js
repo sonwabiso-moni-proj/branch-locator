@@ -2,2312 +2,805 @@ import { delay, http, HttpResponse } from "msw";
 import { setupWorker } from "msw/browser";
 
 import { API_PATHS } from "../../constants/api-paths";
+
 console.info("🟡 USING MOCK SERVICE (Branch Locator)");
 
-const branches = [
+const DEFAULT_OPERATING_HOURS = {
+  monday: "08:00-17:00",
+  tuesday: "08:00-17:00",
+  wednesday: "08:00-17:00",
+  thursday: "08:00-17:00",
+  friday: "08:00-16:00",
+  saturday: "09:00-13:00",
+  sunday: "Closed",
+};
+
+const PROVINCE_LANGUAGES = {
+  Gauteng: ["English", "Zulu", "Afrikaans"],
+  "Western Cape": ["English", "Afrikaans", "Xhosa"],
+  "KwaZulu-Natal": ["English", "Zulu"],
+  "Eastern Cape": ["English", "Xhosa", "Afrikaans"],
+  "Free State": ["English", "Sotho", "Afrikaans"],
+  Limpopo: ["English", "Sepedi", "Tshivenda", "Tsonga"],
+  Mpumalanga: ["English", "Zulu", "Siswati"],
+  "North West": ["English", "Setswana", "Afrikaans"],
+  "Northern Cape": ["English", "Afrikaans", "Setswana"],
+};
+
+const FACILITY_SETS = [
+  ["ATM", "Parking"],
+  ["ATM", "Cash Accepting ATM", "Parking"],
+  ["ATM", "Parking", "WiFi"],
+  ["ATM", "Cash Accepting ATM", "Parking", "Wheelchair Access"],
+  ["ATM", "Parking", "WiFi", "Wheelchair Access"],
+];
+
+const SERVICE_SETS = [
+  ["Savings", "Loans"],
+  ["Savings", "Insurance", "Account Opening"],
+  ["Loans", "Insurance", "Savings"],
+  ["Loans", "Insurance", "Savings", "Account Opening"],
+  ["Savings", "Smart ID Services", "Account Opening"],
+  ["Business Banking Centre", "Account Opening"],
+  ["Savings", "Business Banking Centre", "Loans"],
+];
+
+const BUSY_LEVELS = ["Not Busy", "Moderate", "Busy", "Very Busy"];
+
+const BRANCH_LOCATIONS = [
+  // Gauteng
   {
-    id: "1",
     name: "Sandton City Branch",
     province: "Gauteng",
-    address: {
-      street: "5 Rivonia Road",
-      suburb: "Sandton",
-      city: "Johannesburg",
-      province: "Gauteng",
-      postalCode: "2196",
-    },
-    coordinates: {
-      latitude: -26.1076,
-      longitude: 28.0567,
-    },
-    languages: ["English", "Zulu", "Xitsonga"],
-    facilities: ["Parking", "ATM", "Wheelchair Access", "WiFi"],
-    services: ["Loans", "Insurance", "Savings", "Account Opening"],
-    operatingHours: {
-      monday: "08:00-17:00",
-      tuesday: "08:00-17:00",
-      wednesday: "08:00-17:00",
-      thursday: "08:00-17:00",
-      friday: "08:00-16:00",
-      saturday: "09:00-13:00",
-      sunday: "Closed",
-    },
-    contacts: {
-      phone: "0115550101",
-      email: "sandton@bank.co.za",
-    },
-    rating: 4.8,
-    isOpen: true,
-    busyTimes: {
-      Monday: [
-        { time: "08:00", level: "Busy" },
-        { time: "09:00", level: "Moderate" },
-        { time: "13:00", level: "Moderate" }
-      ],
-    },
-    imageUrl: null,
-    notes: "Located inside Sandton City Mall.",
+    street: "5 Rivonia Road",
+    suburb: "Sandton",
+    city: "Johannesburg",
+    postalCode: "2196",
+    latitude: -26.1076,
+    longitude: 28.0567,
+    phonePrefix: "011",
   },
-
   {
-    id: "2",
     name: "Rosebank Branch",
     province: "Gauteng",
-    address: {
-      street: "50 Oxford Road",
-      suburb: "Rosebank",
-      city: "Johannesburg",
-      province: "Gauteng",
-      postalCode: "2196",
-    },
-    coordinates: {
-      latitude: -26.1466,
-      longitude: 28.0418,
-    },
-    languages: ["English", "Zulu", "Sotho"],
-    facilities: ["Parking", "ATM", "WiFi"],
-    services: ["Savings", "Insurance", "Account Opening"],
-    operatingHours: {
-      monday: "08:00-17:00",
-      tuesday: "08:00-17:00",
-      wednesday: "08:00-17:00",
-      thursday: "08:00-17:00",
-      friday: "08:00-16:00",
-      saturday: "09:00-13:00",
-      sunday: "Closed",
-    },
-    contacts: {
-      phone: "0115550102",
-      email: "rosebank@bank.co.za",
-    },
-    rating: 4.6,
-    isOpen: true,
-    busyTimes: {
-      Monday: [
-        { time: "09:00", level: "Quiet" },
-        { time: "10:00", level: "Very Busy" },
-        { time: "13:00", level: "Quiet" }
-      ],
-    },
-    imageUrl: null,
-    notes: null,
+    street: "50 Oxford Road",
+    suburb: "Rosebank",
+    city: "Johannesburg",
+    postalCode: "2196",
+    latitude: -26.1466,
+    longitude: 28.0418,
+    phonePrefix: "011",
   },
-
   {
-    id: "3",
     name: "Menlyn Branch",
     province: "Gauteng",
-    address: {
-      street: "12 Atterbury Road",
-      suburb: "Menlyn",
-      city: "Pretoria",
-      province: "Gauteng",
-      postalCode: "0181",
-    },
-    coordinates: {
-      latitude: -25.785,
-      longitude: 28.276,
-    },
-    languages: ["English", "Xitsonga", "Afrikaans"],
-    facilities: ["Parking", "ATM", "Wheelchair Access"],
-    services: ["Loans", "Savings"],
-    operatingHours: {
-      monday: "08:00-17:00",
-      tuesday: "08:00-17:00",
-      wednesday: "08:00-17:00",
-      thursday: "08:00-17:00",
-      friday: "08:00-16:00",
-      saturday: "09:00-13:00",
-      sunday: "Closed",
-    },
-    contacts: {
-      phone: "0125550103",
-      email: "menlyn@bank.co.za",
-    },
-    rating: 4.5,
-    isOpen: false,
-    busyTimes: {
-      Monday: [
-        { time: "08:00", level: "Moderate" },
-        { time: "09:00", level: "Quiet" },
-        { time: "15:00", level: "Moderate" }
-      ],
-    },
-    imageUrl: null,
-    notes: null,
+    street: "12 Atterbury Road",
+    suburb: "Menlyn",
+    city: "Pretoria",
+    postalCode: "0181",
+    latitude: -25.785,
+    longitude: 28.276,
+    phonePrefix: "012",
   },
-
   {
-    id: "11",
     name: "Fourways Branch",
     province: "Gauteng",
-    address: {
-      street: "2 Fourways Boulevard",
-      suburb: "Fourways",
-      city: "Johannesburg",
-      province: "Gauteng",
-      postalCode: "2055",
-    },
-    coordinates: {
-      latitude: -26.0128,
-      longitude: 28.0098,
-    },
-    languages: ["English", "Zulu", "Afrikaans"],
-    facilities: ["Parking", "ATM", "WiFi", "Wheelchair Access"],
-    services: ["Loans", "Savings", "Account Opening"],
-    operatingHours: {
-      monday: "08:00-17:00",
-      tuesday: "08:00-17:00",
-      wednesday: "08:00-17:00",
-      thursday: "08:00-17:00",
-      friday: "08:00-16:00",
-      saturday: "09:00-13:00",
-      sunday: "Closed",
-    },
-    contacts: {
-      phone: "0115550111",
-      email: "fourways@bank.co.za",
-    },
-    rating: 4.4,
-    isOpen: true,
-    busyTimes: {
-      Monday: [
-        { time: "09:00", level: "Very Busy" },
-        { time: "14:00", level: "Busy" },
-        { time: "16:00", level: "Quiet" }
-      ],
-    },
-    imageUrl: null,
-    notes: null,
+    street: "2 Fourways Boulevard",
+    suburb: "Fourways",
+    city: "Johannesburg",
+    postalCode: "2055",
+    latitude: -26.0128,
+    longitude: 28.0098,
+    phonePrefix: "011",
   },
-
   {
-    id: "12",
     name: "Midrand Branch",
     province: "Gauteng",
-    address: {
-      street: "18 New Road",
-      suburb: "Halfway House",
-      city: "Midrand",
-      province: "Gauteng",
-      postalCode: "1685",
-    },
-    coordinates: {
-      latitude: -25.9992,
-      longitude: 28.1123,
-    },
-    languages: ["English", "Zulu"],
-    facilities: ["Parking", "ATM"],
-    services: ["Savings", "Insurance"],
-    operatingHours: {
-      monday: "08:00-17:00",
-      tuesday: "08:00-17:00",
-      wednesday: "08:00-17:00",
-      thursday: "08:00-17:00",
-      friday: "08:00-16:00",
-      saturday: "09:00-13:00",
-      sunday: "Closed",
-    },
-    contacts: {
-      phone: "0115550112",
-      email: "midrand@bank.co.za",
-    },
-    rating: 4.3,
-    isOpen: true,
-    busyTimes: {
-      Monday: [
-        { time: "10:00", level: "Busy" },
-        { time: "14:00", level: "Moderate" },
-        { time: "16:00", level: "Moderate" }
-      ],
-    },
-    imageUrl: null,
-    notes: null,
+    street: "18 New Road",
+    suburb: "Halfway House",
+    city: "Midrand",
+    postalCode: "1685",
+    latitude: -25.9992,
+    longitude: 28.1123,
+    phonePrefix: "011",
   },
-
   {
-    id: "13",
     name: "Centurion Branch",
     province: "Gauteng",
-    address: {
-      street: "1 Heuwel Avenue",
-      suburb: "Centurion Central",
-      city: "Centurion",
-      province: "Gauteng",
-      postalCode: "0157",
-    },
-    coordinates: {
-      latitude: -25.8603,
-      longitude: 28.1894,
-    },
-    languages: ["English", "Afrikaans"],
-    facilities: ["Parking", "ATM", "WiFi"],
-    services: ["Loans", "Savings", "Account Opening"],
-    operatingHours: {
-      monday: "08:00-17:00",
-      tuesday: "08:00-17:00",
-      wednesday: "08:00-17:00",
-      thursday: "08:00-17:00",
-      friday: "08:00-16:00",
-      saturday: "09:00-13:00",
-      sunday: "Closed",
-    },
-    contacts: {
-      phone: "0125550113",
-      email: "centurion@bank.co.za",
-    },
-    rating: 4.6,
-    isOpen: true,
-    busyTimes: {
-      Monday: [
-        { time: "08:00", level: "Very Busy" },
-        { time: "09:00", level: "Quiet" },
-        { time: "13:00", level: "Busy" }
-      ],
-    },
-    imageUrl: null,
-    notes: null,
+    street: "1 Heuwel Avenue",
+    suburb: "Centurion Central",
+    city: "Centurion",
+    postalCode: "0157",
+    latitude: -25.8603,
+    longitude: 28.1894,
+    phonePrefix: "012",
   },
-
   {
-    id: "14",
     name: "Soweto Branch",
     province: "Gauteng",
-    address: {
-      street: "120 Vilakazi Street",
-      suburb: "Orlando West",
-      city: "Soweto",
-      province: "Gauteng",
-      postalCode: "1804",
-    },
-    coordinates: {
-      latitude: -26.2384,
-      longitude: 27.9042,
-    },
-    languages: ["English", "Zulu", "Sotho"],
-    facilities: ["Parking", "ATM", "Wheelchair Access"],
-    services: ["Savings", "Loans", "Account Opening"],
-    operatingHours: {
-      monday: "08:00-17:00",
-      tuesday: "08:00-17:00",
-      wednesday: "08:00-17:00",
-      thursday: "08:00-17:00",
-      friday: "08:00-16:00",
-      saturday: "09:00-13:00",
-      sunday: "Closed",
-    },
-    contacts: {
-      phone: "0115550114",
-      email: "soweto@bank.co.za",
-    },
-    rating: 4.7,
-    isOpen: true,
-    busyTimes: {
-      Monday: [
-        { time: "12:00", level: "Quiet" },
-        { time: "13:00", level: "Very Busy" },
-        { time: "14:00", level: "Quiet" }
-      ],
-    },
-    imageUrl: null,
-    notes: null,
+    street: "120 Vilakazi Street",
+    suburb: "Orlando West",
+    city: "Soweto",
+    postalCode: "1804",
+    latitude: -26.2384,
+    longitude: 27.9042,
+    phonePrefix: "011",
   },
-
   {
-    id: "15",
-    name: "Pretoria CBD Branch",
-    province: "Gauteng",
-    address: {
-      street: "225 Church Street",
-      suburb: "CBD",
-      city: "Pretoria",
-      province: "Gauteng",
-      postalCode: "0002",
-    },
-    coordinates: {
-      latitude: -25.7479,
-      longitude: 28.1879,
-    },
-    languages: ["English", "Afrikaans", "Sepedi"],
-    facilities: ["Parking", "ATM", "WiFi", "Wheelchair Access"],
-    services: ["Loans", "Insurance", "Savings", "Account Opening"],
-    operatingHours: {
-      monday: "08:00-17:00",
-      tuesday: "08:00-17:00",
-      wednesday: "08:00-17:00",
-      thursday: "08:00-17:00",
-      friday: "08:00-16:00",
-      saturday: "09:00-13:00",
-      sunday: "Closed",
-    },
-    contacts: {
-      phone: "0125550115",
-      email: "pretoriacbd@bank.co.za",
-    },
-    rating: 4.2,
-    isOpen: true,
-    busyTimes: {
-      Monday: [
-        { time: "09:00", level: "Busy" },
-        { time: "14:00", level: "Busy" }
-      ],
-    },
-    imageUrl: null,
-    notes: null,
-  },
-
-  {
-    id: "16",
-    name: "Randburg Branch",
-    province: "Gauteng",
-    address: {
-      street: "9 Bram Fischer Drive",
-      suburb: "Randburg",
-      city: "Johannesburg",
-      province: "Gauteng",
-      postalCode: "2194",
-    },
-    coordinates: {
-      latitude: -26.0939,
-      longitude: 28.0064,
-    },
-    languages: ["English", "Zulu", "Afrikaans"],
-    facilities: ["Parking", "ATM"],
-    services: ["Savings", "Insurance"],
-    operatingHours: {
-      monday: "08:00-17:00",
-      tuesday: "08:00-17:00",
-      wednesday: "08:00-17:00",
-      thursday: "08:00-17:00",
-      friday: "08:00-16:00",
-      saturday: "09:00-13:00",
-      sunday: "Closed",
-    },
-    contacts: {
-      phone: "0115550116",
-      email: "randburg@bank.co.za",
-    },
-    rating: 4.0,
-    isOpen: false,
-    busyTimes: {
-      Monday: [
-        { time: "09:00", level: "Quiet" },
-        { time: "11:00", level: "Moderate" }
-      ],
-    },
-    imageUrl: null,
-    notes: null,
-  },
-
-  {
-    id: "17",
     name: "Boksburg Branch",
     province: "Gauteng",
-    address: {
-      street: "30 Trichardt Road",
-      suburb: "Boksburg Central",
-      city: "Boksburg",
-      province: "Gauteng",
-      postalCode: "1459",
-    },
-    coordinates: {
-      latitude: -26.212,
-      longitude: 28.259,
-    },
-    languages: ["English", "Zulu"],
-    facilities: ["Parking", "ATM", "Wheelchair Access"],
-    services: ["Loans", "Savings"],
-    operatingHours: {
-      monday: "08:00-17:00",
-      tuesday: "08:00-17:00",
-      wednesday: "08:00-17:00",
-      thursday: "08:00-17:00",
-      friday: "08:00-16:00",
-      saturday: "09:00-13:00",
-      sunday: "Closed",
-    },
-    contacts: {
-      phone: "0115550117",
-      email: "boksburg@bank.co.za",
-    },
-    rating: 4.1,
-    isOpen: true,
-    busyTimes: {
-      Monday: [
-        { time: "09:00", level: "Moderate" },
-        { time: "12:00", level: "Quiet" }
-      ],
-    },
-    imageUrl: null,
-    notes: null,
+    street: "30 Trichardt Road",
+    suburb: "Boksburg Central",
+    city: "Boksburg",
+    postalCode: "1459",
+    latitude: -26.212,
+    longitude: 28.259,
+    phonePrefix: "011",
   },
 
+  // Western Cape
   {
-    id: "4",
     name: "Cape Town CBD Branch",
     province: "Western Cape",
-    address: {
-      street: "80 Adderley Street",
-      suburb: "CBD",
-      city: "Cape Town",
-      province: "Western Cape",
-      postalCode: "8001",
-    },
-    coordinates: {
-      latitude: -33.9249,
-      longitude: 18.4241,
-    },
-    languages: ["English", "Afrikaans", "Xhosa"],
-    facilities: ["Parking", "ATM", "WiFi", "Wheelchair Access"],
-    services: ["Loans", "Insurance", "Savings", "Account Opening"],
-    operatingHours: {
-      monday: "08:00-17:00",
-      tuesday: "08:00-17:00",
-      wednesday: "08:00-17:00",
-      thursday: "08:00-17:00",
-      friday: "08:00-16:00",
-      saturday: "09:00-13:00",
-      sunday: "Closed",
-    },
-    contacts: {
-      phone: "0215550104",
-      email: "capetown@bank.co.za",
-    },
-    rating: 4.9,
-    isOpen: true,
-    busyTimes: {
-      Monday: [
-        { time: "11:00", level: "Busy" },
-        { time: "12:00", level: "Moderate" },
-        { time: "14:00", level: "Busy" }
-      ],
-    },
-    imageUrl: null,
-    notes: null,
+    street: "80 Adderley Street",
+    suburb: "CBD",
+    city: "Cape Town",
+    postalCode: "8001",
+    latitude: -33.9249,
+    longitude: 18.4241,
+    phonePrefix: "021",
   },
-
   {
-    id: "5",
     name: "Century City Branch",
     province: "Western Cape",
-    address: {
-      street: "Century Boulevard",
-      suburb: "Century City",
-      city: "Cape Town",
-      province: "Western Cape",
-      postalCode: "7441",
-    },
-    coordinates: {
-      latitude: -33.8938,
-      longitude: 18.508,
-    },
-    languages: ["English", "Afrikaans"],
-    facilities: ["Parking", "ATM"],
-    services: ["Savings", "Insurance", "Account Opening"],
-    operatingHours: {
-      monday: "08:00-17:00",
-      tuesday: "08:00-17:00",
-      wednesday: "08:00-17:00",
-      thursday: "08:00-17:00",
-      friday: "08:00-16:00",
-      saturday: "09:00-13:00",
-      sunday: "Closed",
-    },
-    contacts: {
-      phone: "0215550105",
-      email: "centurycity@bank.co.za",
-    },
-    rating: 4.3,
-    isOpen: true,
-    busyTimes: {
-      Monday: [
-        { time: "11:00", level: "Busy" },
-        { time: "13:00", level: "Quiet" },
-        { time: "16:00", level: "Moderate" }
-      ],
-    },
-    imageUrl: null,
-    notes: null,
+    street: "Century Boulevard",
+    suburb: "Century City",
+    city: "Cape Town",
+    postalCode: "7441",
+    latitude: -33.8938,
+    longitude: 18.508,
+    phonePrefix: "021",
   },
-
   {
-    id: "18",
-    name: "Claremont Branch",
-    province: "Western Cape",
-    address: {
-      street: "3 Main Road",
-      suburb: "Claremont",
-      city: "Cape Town",
-      province: "Western Cape",
-      postalCode: "7708",
-    },
-    coordinates: {
-      latitude: -33.9819,
-      longitude: 18.4649,
-    },
-    languages: ["English", "Afrikaans", "Xhosa"],
-    facilities: ["Parking", "ATM", "WiFi"],
-    services: ["Loans", "Savings"],
-    operatingHours: {
-      monday: "08:00-17:00",
-      tuesday: "08:00-17:00",
-      wednesday: "08:00-17:00",
-      thursday: "08:00-17:00",
-      friday: "08:00-16:00",
-      saturday: "09:00-13:00",
-      sunday: "Closed",
-    },
-    contacts: {
-      phone: "0215550118",
-      email: "claremont@bank.co.za",
-    },
-    rating: 4.5,
-    isOpen: true,
-    busyTimes: {
-      Monday: [
-        { time: "09:00", level: "Very Busy" },
-        { time: "11:00", level: "Very Busy" },
-        { time: "16:00", level: "Busy" }
-      ],
-    },
-    imageUrl: null,
-    notes: null,
-  },
-
-  {
-    id: "19",
-    name: "Stellenbosch Branch",
-    province: "Western Cape",
-    address: {
-      street: "12 Dorp Street",
-      suburb: "Stellenbosch Central",
-      city: "Stellenbosch",
-      province: "Western Cape",
-      postalCode: "7600",
-    },
-    coordinates: {
-      latitude: -33.9346,
-      longitude: 18.8601,
-    },
-    languages: ["English", "Afrikaans"],
-    facilities: ["Parking", "ATM", "Wheelchair Access"],
-    services: ["Savings", "Account Opening"],
-    operatingHours: {
-      monday: "08:00-17:00",
-      tuesday: "08:00-17:00",
-      wednesday: "08:00-17:00",
-      thursday: "08:00-17:00",
-      friday: "08:00-16:00",
-      saturday: "09:00-13:00",
-      sunday: "Closed",
-    },
-    contacts: {
-      phone: "0215550119",
-      email: "stellenbosch@bank.co.za",
-    },
-    rating: 4.6,
-    isOpen: true,
-    busyTimes: {
-      Monday: [
-        { time: "11:00", level: "Busy" },
-        { time: "13:00", level: "Quiet" },
-        { time: "16:00", level: "Moderate" }
-      ],
-    },
-    imageUrl: null,
-    notes: null,
-  },
-
-  {
-    id: "20",
-    name: "George Branch",
-    province: "Western Cape",
-    address: {
-      street: "45 York Street",
-      suburb: "Central",
-      city: "George",
-      province: "Western Cape",
-      postalCode: "6529",
-    },
-    coordinates: {
-      latitude: -33.9628,
-      longitude: 22.4573,
-    },
-    languages: ["English", "Afrikaans"],
-    facilities: ["Parking", "ATM"],
-    services: ["Loans", "Savings", "Insurance"],
-    operatingHours: {
-      monday: "08:00-17:00",
-      tuesday: "08:00-17:00",
-      wednesday: "08:00-17:00",
-      thursday: "08:00-17:00",
-      friday: "08:00-16:00",
-      saturday: "09:00-13:00",
-      sunday: "Closed",
-    },
-    contacts: {
-      phone: "0445550120",
-      email: "george@bank.co.za",
-    },
-    rating: 4.2,
-    isOpen: true,
-    busyTimes: {
-      Monday: [
-        { time: "08:00", level: "Very Busy" },
-        { time: "13:00", level: "Busy" }
-      ],
-    },
-    imageUrl: null,
-    notes: null,
-  },
-
-  {
-    id: "21",
     name: "Bellville Branch",
     province: "Western Cape",
-    address: {
-      street: "27 Voortrekker Road",
-      suburb: "Bellville Central",
-      city: "Cape Town",
-      province: "Western Cape",
-      postalCode: "7530",
-    },
-    coordinates: {
-      latitude: -33.9,
-      longitude: 18.6292,
-    },
-    languages: ["English", "Afrikaans", "Xhosa"],
-    facilities: ["Parking", "ATM", "WiFi", "Wheelchair Access"],
-    services: ["Loans", "Savings", "Insurance", "Account Opening"],
-    operatingHours: {
-      monday: "08:00-17:00",
-      tuesday: "08:00-17:00",
-      wednesday: "08:00-17:00",
-      thursday: "08:00-17:00",
-      friday: "08:00-16:00",
-      saturday: "09:00-13:00",
-      sunday: "Closed",
-    },
-    contacts: {
-      phone: "0215550121",
-      email: "bellville@bank.co.za",
-    },
-    rating: 4.4,
-    isOpen: false,
-    busyTimes: {
-      Monday: [
-        { time: "09:00", level: "Busy" },
-        { time: "11:00", level: "Moderate" },
-        { time: "12:00", level: "Very Busy" }
-      ],
-    },
-    imageUrl: null,
-    notes: null,
+    street: "27 Voortrekker Road",
+    suburb: "Bellville Central",
+    city: "Cape Town",
+    postalCode: "7530",
+    latitude: -33.9,
+    longitude: 18.6292,
+    phonePrefix: "021",
   },
-
   {
-    id: "6",
-    name: "Durban Central Branch",
-    province: "KwaZulu-Natal",
-    address: {
-      street: "101 Dr Pixley KaSeme Street",
-      suburb: "CBD",
-      city: "Durban",
-      province: "KwaZulu-Natal",
-      postalCode: "4001",
-    },
-    coordinates: {
-      latitude: -29.8587,
-      longitude: 31.0218,
-    },
-    languages: ["English", "Zulu"],
-    facilities: ["ATM", "Parking", "Wheelchair Access"],
-    services: ["Loans", "Savings", "Insurance"],
-    operatingHours: {
-      monday: "08:00-17:00",
-      tuesday: "08:00-17:00",
-      wednesday: "08:00-17:00",
-      thursday: "08:00-17:00",
-      friday: "08:00-16:00",
-      saturday: "09:00-13:00",
-      sunday: "Closed",
-    },
-    contacts: {
-      phone: "0315550106",
-      email: "durban@bank.co.za",
-    },
-    rating: 4.5,
-    isOpen: true,
-    busyTimes: {
-      Monday: [
-        { time: "09:00", level: "Busy" },
-        { time: "14:00", level: "Moderate" },
-        { time: "15:00", level: "Moderate" }
-      ],
-    },
-    imageUrl: null,
-    notes: null,
+    name: "Claremont Branch",
+    province: "Western Cape",
+    street: "3 Main Road",
+    suburb: "Claremont",
+    city: "Cape Town",
+    postalCode: "7708",
+    latitude: -33.9819,
+    longitude: 18.4649,
+    phonePrefix: "021",
   },
-
   {
-    id: "7",
-    name: "Umhlanga Branch",
-    province: "KwaZulu-Natal",
-    address: {
-      street: "1 Lighthouse Road",
-      suburb: "Umhlanga",
-      city: "Durban",
-      province: "KwaZulu-Natal",
-      postalCode: "4320",
-    },
-    coordinates: {
-      latitude: -29.7266,
-      longitude: 31.0845,
-    },
-    languages: ["English", "Zulu"],
-    facilities: ["Parking", "ATM", "WiFi"],
-    services: ["Savings", "Account Opening"],
-    operatingHours: {
-      monday: "08:00-17:00",
-      tuesday: "08:00-17:00",
-      wednesday: "08:00-17:00",
-      thursday: "08:00-17:00",
-      friday: "08:00-16:00",
-      saturday: "09:00-13:00",
-      sunday: "Closed",
-    },
-    contacts: {
-      phone: "0315550107",
-      email: "umhlanga@bank.co.za",
-    },
-    rating: 4.7,
-    isOpen: true,
-    busyTimes: {
-      Monday: [
-        { time: "12:00", level: "Very Busy" },
-        { time: "13:00", level: "Very Busy" },
-        { time: "16:00", level: "Busy" }
-      ],
-    },
-    imageUrl: null,
-    notes: null,
+    name: "Stellenbosch Branch",
+    province: "Western Cape",
+    street: "12 Dorp Street",
+    suburb: "Stellenbosch Central",
+    city: "Stellenbosch",
+    postalCode: "7600",
+    latitude: -33.9346,
+    longitude: 18.8601,
+    phonePrefix: "021",
   },
-
   {
-    id: "22",
-    name: "Pietermaritzburg Branch",
-    province: "KwaZulu-Natal",
-    address: {
-      street: "210 Church Street",
-      suburb: "CBD",
-      city: "Pietermaritzburg",
-      province: "KwaZulu-Natal",
-      postalCode: "3201",
-    },
-    coordinates: {
-      latitude: -29.6006,
-      longitude: 30.3794,
-    },
-    languages: ["English", "Zulu", "Afrikaans"],
-    facilities: ["Parking", "ATM", "Wheelchair Access"],
-    services: ["Loans", "Savings"],
-    operatingHours: {
-      monday: "08:00-17:00",
-      tuesday: "08:00-17:00",
-      wednesday: "08:00-17:00",
-      thursday: "08:00-17:00",
-      friday: "08:00-16:00",
-      saturday: "09:00-13:00",
-      sunday: "Closed",
-    },
-    contacts: {
-      phone: "0335550122",
-      email: "pmb@bank.co.za",
-    },
-    rating: 4.1,
-    isOpen: true,
-    busyTimes: {
-      Monday: [
-        { time: "10:00", level: "Very Busy" },
-        { time: "11:00", level: "Quiet" }
-      ],
-    },
-    imageUrl: null,
-    notes: null,
+    name: "George Branch",
+    province: "Western Cape",
+    street: "45 York Street",
+    suburb: "Central",
+    city: "George",
+    postalCode: "6529",
+    latitude: -33.9628,
+    longitude: 22.4573,
+    phonePrefix: "044",
   },
-
   {
-    id: "23",
-    name: "Ballito Branch",
-    province: "KwaZulu-Natal",
-    address: {
-      street: "10 Ballito Drive",
-      suburb: "Ballito Central",
-      city: "Ballito",
-      province: "KwaZulu-Natal",
-      postalCode: "4420",
-    },
-    coordinates: {
-      latitude: -29.5385,
-      longitude: 31.2141,
-    },
-    languages: ["English", "Zulu"],
-    facilities: ["Parking", "ATM", "WiFi"],
-    services: ["Savings", "Insurance", "Account Opening"],
-    operatingHours: {
-      monday: "08:00-17:00",
-      tuesday: "08:00-17:00",
-      wednesday: "08:00-17:00",
-      thursday: "08:00-17:00",
-      friday: "08:00-16:00",
-      saturday: "09:00-13:00",
-      sunday: "Closed",
-    },
-    contacts: {
-      phone: "0325550123",
-      email: "ballito@bank.co.za",
-    },
-    rating: 4.6,
-    isOpen: true,
-    busyTimes: {
-      Monday: [
-        { time: "08:00", level: "Moderate" },
-        { time: "09:00", level: "Very Busy" },
-        { time: "15:00", level: "Quiet" }
-      ],
-    },
-    imageUrl: null,
-    notes: null,
-  },
-
-  {
-    id: "24",
-    name: "Newcastle Branch",
-    province: "KwaZulu-Natal",
-    address: {
-      street: "55 Murchison Street",
-      suburb: "Newcastle Central",
-      city: "Newcastle",
-      province: "KwaZulu-Natal",
-      postalCode: "2940",
-    },
-    coordinates: {
-      latitude: -27.7573,
-      longitude: 29.9319,
-    },
-    languages: ["English", "Zulu", "Afrikaans"],
-    facilities: ["ATM", "Parking"],
-    services: ["Loans", "Savings", "Insurance"],
-    operatingHours: {
-      monday: "08:00-17:00",
-      tuesday: "08:00-17:00",
-      wednesday: "08:00-17:00",
-      thursday: "08:00-17:00",
-      friday: "08:00-16:00",
-      saturday: "09:00-13:00",
-      sunday: "Closed",
-    },
-    contacts: {
-      phone: "0345550124",
-      email: "newcastle@bank.co.za",
-    },
-    rating: 3.9,
-    isOpen: false,
-    busyTimes: {
-      Monday: [
-        { time: "14:00", level: "Very Busy" },
-        { time: "16:00", level: "Busy" }
-      ],
-    },
-    imageUrl: null,
-    notes: null,
-  },
-
-  {
-    id: "8",
-    name: "Gqeberha Branch",
-    province: "Eastern Cape",
-    address: {
-      street: "25 Govan Mbeki Avenue",
-      suburb: "Central",
-      city: "Gqeberha",
-      province: "Eastern Cape",
-      postalCode: "6001",
-    },
-    coordinates: {
-      latitude: -33.9608,
-      longitude: 25.6022,
-    },
-    languages: ["English", "Xhosa"],
-    facilities: ["ATM", "Parking"],
-    services: ["Loans", "Savings", "Insurance"],
-    operatingHours: {
-      monday: "08:00-17:00",
-      tuesday: "08:00-17:00",
-      wednesday: "08:00-17:00",
-      thursday: "08:00-17:00",
-      friday: "08:00-16:00",
-      saturday: "09:00-13:00",
-      sunday: "Closed",
-    },
-    contacts: {
-      phone: "0415550108",
-      email: "gqeberha@bank.co.za",
-    },
-    rating: 4.2,
-    isOpen: false,
-    busyTimes: {
-      Monday: [
-        { time: "08:00", level: "Quiet" },
-        { time: "16:00", level: "Busy" }
-      ],
-    },
-    imageUrl: null,
-    notes: null,
-  },
-
-  {
-    id: "25",
-    name: "East London Branch",
-    province: "Eastern Cape",
-    address: {
-      street: "33 Oxford Street",
-      suburb: "CBD",
-      city: "East London",
-      province: "Eastern Cape",
-      postalCode: "5201",
-    },
-    coordinates: {
-      latitude: -33.0153,
-      longitude: 27.9116,
-    },
-    languages: ["English", "Xhosa", "Afrikaans"],
-    facilities: ["Parking", "ATM", "Wheelchair Access"],
-    services: ["Savings", "Loans", "Account Opening"],
-    operatingHours: {
-      monday: "08:00-17:00",
-      tuesday: "08:00-17:00",
-      wednesday: "08:00-17:00",
-      thursday: "08:00-17:00",
-      friday: "08:00-16:00",
-      saturday: "09:00-13:00",
-      sunday: "Closed",
-    },
-    contacts: {
-      phone: "0435550125",
-      email: "eastlondon@bank.co.za",
-    },
-    rating: 4.3,
-    isOpen: true,
-    busyTimes: {
-      Monday: [
-        { time: "09:00", level: "Very Busy" },
-        { time: "10:00", level: "Moderate" },
-        { time: "13:00", level: "Very Busy" }
-      ],
-    },
-    imageUrl: null,
-    notes: null,
-  },
-
-  {
-    id: "26",
-    name: "Mthatha Branch",
-    province: "Eastern Cape",
-    address: {
-      street: "14 Sutherland Street",
-      suburb: "CBD",
-      city: "Mthatha",
-      province: "Eastern Cape",
-      postalCode: "5099",
-    },
-    coordinates: {
-      latitude: -31.5889,
-      longitude: 28.7844,
-    },
-    languages: ["English", "Xhosa"],
-    facilities: ["ATM", "Parking"],
-    services: ["Savings", "Insurance"],
-    operatingHours: {
-      monday: "08:00-17:00",
-      tuesday: "08:00-17:00",
-      wednesday: "08:00-17:00",
-      thursday: "08:00-17:00",
-      friday: "08:00-16:00",
-      saturday: "09:00-13:00",
-      sunday: "Closed",
-    },
-    contacts: {
-      phone: "0475550126",
-      email: "mthatha@bank.co.za",
-    },
-    rating: 4.0,
-    isOpen: true,
-    busyTimes: {
-      Monday: [
-        { time: "08:00", level: "Moderate" },
-        { time: "12:00", level: "Quiet" }
-      ],
-    },
-    imageUrl: null,
-    notes: null,
-  },
-
-  {
-    id: "9",
-    name: "Bloemfontein Branch",
-    province: "Free State",
-    address: {
-      street: "155 Nelson Mandela Drive",
-      suburb: "Westdene",
-      city: "Bloemfontein",
-      province: "Free State",
-      postalCode: "9301",
-    },
-    coordinates: {
-      latitude: -29.1183,
-      longitude: 26.2299,
-    },
-    languages: ["English", "Sotho", "Afrikaans"],
-    facilities: ["ATM", "Parking", "Wheelchair Access"],
-    services: ["Loans", "Savings", "Insurance", "Account Opening"],
-    operatingHours: {
-      monday: "08:00-17:00",
-      tuesday: "08:00-17:00",
-      wednesday: "08:00-17:00",
-      thursday: "08:00-17:00",
-      friday: "08:00-16:00",
-      saturday: "09:00-13:00",
-      sunday: "Closed",
-    },
-    contacts: {
-      phone: "0515550109",
-      email: "bloem@bank.co.za",
-    },
-    rating: 4.4,
-    isOpen: true,
-    busyTimes: {
-      Monday: [
-        { time: "09:00", level: "Busy" },
-        { time: "11:00", level: "Moderate" },
-        { time: "12:00", level: "Quiet" }
-      ],
-    },
-    imageUrl: null,
-    notes: null,
-  },
-
-  {
-    id: "27",
-    name: "Welkom Branch",
-    province: "Free State",
-    address: {
-      street: "22 Stateway",
-      suburb: "Welkom Central",
-      city: "Welkom",
-      province: "Free State",
-      postalCode: "9459",
-    },
-    coordinates: {
-      latitude: -27.9789,
-      longitude: 26.7362,
-    },
-    languages: ["English", "Sotho", "Afrikaans"],
-    facilities: ["ATM", "Parking"],
-    services: ["Savings", "Loans"],
-    operatingHours: {
-      monday: "08:00-17:00",
-      tuesday: "08:00-17:00",
-      wednesday: "08:00-17:00",
-      thursday: "08:00-17:00",
-      friday: "08:00-16:00",
-      saturday: "09:00-13:00",
-      sunday: "Closed",
-    },
-    contacts: {
-      phone: "0575550127",
-      email: "welkom@bank.co.za",
-    },
-    rating: 3.8,
-    isOpen: true,
-    busyTimes: {
-      Monday: [
-        { time: "13:00", level: "Quiet" },
-        { time: "15:00", level: "Quiet" }
-      ],
-    },
-    imageUrl: null,
-    notes: null,
-  },
-
-  {
-    id: "10",
-    name: "Polokwane Branch",
-    province: "Limpopo",
-    address: {
-      street: "45 Market Street",
-      suburb: "CBD",
-      city: "Polokwane",
-      province: "Limpopo",
-      postalCode: "0700",
-    },
-    coordinates: {
-      latitude: -23.9045,
-      longitude: 29.4689,
-    },
-    languages: ["English", "Xitsonga", "Sepedi"],
-    facilities: ["Parking", "ATM", "WiFi"],
-    services: ["Savings", "Loans", "Insurance"],
-    operatingHours: {
-      monday: "08:00-17:00",
-      tuesday: "08:00-17:00",
-      wednesday: "08:00-17:00",
-      thursday: "08:00-17:00",
-      friday: "08:00-16:00",
-      saturday: "09:00-13:00",
-      sunday: "Closed",
-    },
-    contacts: {
-      phone: "0155550110",
-      email: "polokwane@bank.co.za",
-    },
-    rating: 4.1,
-    isOpen: true,
-    busyTimes: {
-      Monday: [
-        { time: "12:00", level: "Moderate" },
-        { time: "13:00", level: "Quiet" }
-      ],
-    },
-    imageUrl: null,
-    notes: null,
-  },
-
-  {
-    id: "28",
-    name: "Tzaneen Branch",
-    province: "Limpopo",
-    address: {
-      street: "8 Danie Joubert Street",
-      suburb: "Tzaneen Central",
-      city: "Tzaneen",
-      province: "Limpopo",
-      postalCode: "0850",
-    },
-    coordinates: {
-      latitude: -23.8339,
-      longitude: 30.1633,
-    },
-    languages: ["English", "Sepedi", "Xitsonga"],
-    facilities: ["ATM", "Parking"],
-    services: ["Savings", "Account Opening"],
-    operatingHours: {
-      monday: "08:00-17:00",
-      tuesday: "08:00-17:00",
-      wednesday: "08:00-17:00",
-      thursday: "08:00-17:00",
-      friday: "08:00-16:00",
-      saturday: "09:00-13:00",
-      sunday: "Closed",
-    },
-    contacts: {
-      phone: "0155550128",
-      email: "tzaneen@bank.co.za",
-    },
-    rating: 4.2,
-    isOpen: true,
-    busyTimes: {
-      Monday: [
-        { time: "09:00", level: "Quiet" },
-        { time: "11:00", level: "Very Busy" }
-      ],
-    },
-    imageUrl: null,
-    notes: null,
-  },
-
-  {
-    id: "29",
-    name: "Nelspruit Branch",
-    province: "Mpumalanga",
-    address: {
-      street: "19 Louis Trichardt Street",
-      suburb: "Nelspruit Central",
-      city: "Mbombela",
-      province: "Mpumalanga",
-      postalCode: "1200",
-    },
-    coordinates: {
-      latitude: -25.4753,
-      longitude: 30.9694,
-    },
-    languages: ["English", "Siswati", "Zulu"],
-    facilities: ["Parking", "ATM", "WiFi", "Wheelchair Access"],
-    services: ["Loans", "Savings", "Insurance", "Account Opening"],
-    operatingHours: {
-      monday: "08:00-17:00",
-      tuesday: "08:00-17:00",
-      wednesday: "08:00-17:00",
-      thursday: "08:00-17:00",
-      friday: "08:00-16:00",
-      saturday: "09:00-13:00",
-      sunday: "Closed",
-    },
-    contacts: {
-      phone: "0135550129",
-      email: "nelspruit@bank.co.za",
-    },
-    rating: 4.4,
-    isOpen: true,
-    busyTimes: {
-      Monday: [
-        { time: "09:00", level: "Very Busy" },
-        { time: "10:00", level: "Moderate" },
-        { time: "16:00", level: "Busy" }
-      ],
-    },
-    imageUrl: null,
-    notes: null,
-  },
-
-  {
-    id: "30",
-    name: "Witbank Branch",
-    province: "Mpumalanga",
-    address: {
-      street: "5 Mandela Street",
-      suburb: "CBD",
-      city: "eMalahleni",
-      province: "Mpumalanga",
-      postalCode: "1035",
-    },
-    coordinates: {
-      latitude: -25.8749,
-      longitude: 29.2325,
-    },
-    languages: ["English", "Zulu", "Afrikaans"],
-    facilities: ["ATM", "Parking"],
-    services: ["Savings", "Loans"],
-    operatingHours: {
-      monday: "08:00-17:00",
-      tuesday: "08:00-17:00",
-      wednesday: "08:00-17:00",
-      thursday: "08:00-17:00",
-      friday: "08:00-16:00",
-      saturday: "09:00-13:00",
-      sunday: "Closed",
-    },
-    contacts: {
-      phone: "0135550130",
-      email: "witbank@bank.co.za",
-    },
-    rating: 3.9,
-    isOpen: false,
-    busyTimes: {
-      Monday: [
-        { time: "14:00", level: "Moderate" },
-        { time: "16:00", level: "Moderate" }
-      ],
-    },
-    imageUrl: null,
-    notes: null,
-  },
-
-  {
-    id: "31",
-    name: "Rustenburg Branch",
-    province: "North West",
-    address: {
-      street: "14 Nelson Mandela Drive",
-      suburb: "CBD",
-      city: "Rustenburg",
-      province: "North West",
-      postalCode: "0299",
-    },
-    coordinates: {
-      latitude: -25.6672,
-      longitude: 27.2424,
-    },
-    languages: ["English", "Setswana", "Afrikaans"],
-    facilities: ["Parking", "ATM", "Wheelchair Access"],
-    services: ["Loans", "Savings", "Insurance"],
-    operatingHours: {
-      monday: "08:00-17:00",
-      tuesday: "08:00-17:00",
-      wednesday: "08:00-17:00",
-      thursday: "08:00-17:00",
-      friday: "08:00-16:00",
-      saturday: "09:00-13:00",
-      sunday: "Closed",
-    },
-    contacts: {
-      phone: "0145550131",
-      email: "rustenburg@bank.co.za",
-    },
-    rating: 4.2,
-    isOpen: true,
-    busyTimes: {
-      Monday: [
-        { time: "12:00", level: "Busy" },
-        { time: "14:00", level: "Very Busy" }
-      ],
-    },
-    imageUrl: null,
-    notes: null,
-  },
-
-  {
-    id: "32",
-    name: "Mahikeng Branch",
-    province: "North West",
-    address: {
-      street: "33 Nelson Mandela Drive",
-      suburb: "CBD",
-      city: "Mahikeng",
-      province: "North West",
-      postalCode: "2745",
-    },
-    coordinates: {
-      latitude: -25.8654,
-      longitude: 25.6438,
-    },
-    languages: ["English", "Setswana"],
-    facilities: ["ATM", "Parking"],
-    services: ["Savings", "Account Opening"],
-    operatingHours: {
-      monday: "08:00-17:00",
-      tuesday: "08:00-17:00",
-      wednesday: "08:00-17:00",
-      thursday: "08:00-17:00",
-      friday: "08:00-16:00",
-      saturday: "09:00-13:00",
-      sunday: "Closed",
-    },
-    contacts: {
-      phone: "0185550132",
-      email: "mahikeng@bank.co.za",
-    },
-    rating: 4.0,
-    isOpen: true,
-    busyTimes: {
-      Monday: [
-        { time: "15:00", level: "Quiet" },
-        { time: "16:00", level: "Moderate" }
-      ],
-    },
-    imageUrl: null,
-    notes: null,
-  },
-
-  {
-    id: "33",
-    name: "Kimberley Branch",
-    province: "Northern Cape",
-    address: {
-      street: "7 Du Toitspan Road",
-      suburb: "CBD",
-      city: "Kimberley",
-      province: "Northern Cape",
-      postalCode: "8301",
-    },
-    coordinates: {
-      latitude: -28.7383,
-      longitude: 24.7642,
-    },
-    languages: ["English", "Afrikaans", "Setswana"],
-    facilities: ["ATM", "Parking", "Wheelchair Access"],
-    services: ["Loans", "Savings", "Insurance"],
-    operatingHours: {
-      monday: "08:00-17:00",
-      tuesday: "08:00-17:00",
-      wednesday: "08:00-17:00",
-      thursday: "08:00-17:00",
-      friday: "08:00-16:00",
-      saturday: "09:00-13:00",
-      sunday: "Closed",
-    },
-    contacts: {
-      phone: "0535550133",
-      email: "kimberley@bank.co.za",
-    },
-    rating: 4.1,
-    isOpen: true,
-    busyTimes: {
-      Monday: [
-        { time: "09:00", level: "Busy" },
-        { time: "11:00", level: "Quiet" }
-      ],
-    },
-    imageUrl: null,
-    notes: null,
-  },
-
-  {
-    id: "34",
-    name: "Upington Branch",
-    province: "Northern Cape",
-    address: {
-      street: "18 Schroder Street",
-      suburb: "CBD",
-      city: "Upington",
-      province: "Northern Cape",
-      postalCode: "8801",
-    },
-    coordinates: {
-      latitude: -28.4478,
-      longitude: 21.2561,
-    },
-    languages: ["English", "Afrikaans"],
-    facilities: ["ATM", "Parking"],
-    services: ["Savings", "Loans"],
-    operatingHours: {
-      monday: "08:00-17:00",
-      tuesday: "08:00-17:00",
-      wednesday: "08:00-17:00",
-      thursday: "08:00-17:00",
-      friday: "08:00-16:00",
-      saturday: "09:00-13:00",
-      sunday: "Closed",
-    },
-    contacts: {
-      phone: "0545550134",
-      email: "upington@bank.co.za",
-    },
-    rating: 3.7,
-    isOpen: true,
-    busyTimes: {
-      Monday: [
-        { time: "11:00", level: "Moderate" },
-        { time: "16:00", level: "Quiet" }
-      ],
-    },
-    imageUrl: null,
-    notes: null,
-  },
-
-  {
-    id: "35",
-    name: "Kempton Park Branch",
-    province: "Gauteng",
-    address: {
-      street: "14 Pretoria Road",
-      suburb: "Kempton Park Central",
-      city: "Kempton Park",
-      province: "Gauteng",
-      postalCode: "1619",
-    },
-    coordinates: {
-      latitude: -26.1015,
-      longitude: 28.2294,
-    },
-    languages: ["English", "Zulu", "Afrikaans"],
-    facilities: ["Parking", "ATM", "Wheelchair Access"],
-    services: ["Loans", "Savings", "Insurance"],
-    operatingHours: {
-      monday: "08:00-17:00",
-      tuesday: "08:00-17:00",
-      wednesday: "08:00-17:00",
-      thursday: "08:00-17:00",
-      friday: "08:00-16:00",
-      saturday: "09:00-13:00",
-      sunday: "Closed",
-    },
-    contacts: {
-      phone: "0115550135",
-      email: "kemptonpark@bank.co.za",
-    },
-    rating: 4.2,
-    isOpen: true,
-    busyTimes: {
-      Monday: [
-        { time: "08:00", level: "Moderate" },
-        { time: "09:00", level: "Quiet" }
-      ],
-    },
-    imageUrl: null,
-    notes: null,
-  },
-
-  {
-    id: "36",
-    name: "Vereeniging Branch",
-    province: "Gauteng",
-    address: {
-      street: "22 Voortrekker Street",
-      suburb: "CBD",
-      city: "Vereeniging",
-      province: "Gauteng",
-      postalCode: "1930",
-    },
-    coordinates: {
-      latitude: -26.6731,
-      longitude: 27.9317,
-    },
-    languages: ["English", "Afrikaans", "Sotho"],
-    facilities: ["ATM", "Parking"],
-    services: ["Savings", "Account Opening"],
-    operatingHours: {
-      monday: "08:00-17:00",
-      tuesday: "08:00-17:00",
-      wednesday: "08:00-17:00",
-      thursday: "08:00-17:00",
-      friday: "08:00-16:00",
-      saturday: "09:00-13:00",
-      sunday: "Closed",
-    },
-    contacts: {
-      phone: "0165550136",
-      email: "vereeniging@bank.co.za",
-    },
-    rating: 3.9,
-    isOpen: true,
-    busyTimes: {
-      Monday: [
-        { time: "08:00", level: "Quiet" },
-        { time: "13:00", level: "Moderate" }
-      ],
-    },
-    imageUrl: null,
-    notes: null,
-  },
-
-  {
-    id: "37",
-    name: "Krugersdorp Branch",
-    province: "Gauteng",
-    address: {
-      street: "5 Human Street",
-      suburb: "CBD",
-      city: "Krugersdorp",
-      province: "Gauteng",
-      postalCode: "1739",
-    },
-    coordinates: {
-      latitude: -26.1023,
-      longitude: 27.7739,
-    },
-    languages: ["English", "Afrikaans", "Zulu"],
-    facilities: ["Parking", "ATM", "WiFi"],
-    services: ["Loans", "Savings"],
-    operatingHours: {
-      monday: "08:00-17:00",
-      tuesday: "08:00-17:00",
-      wednesday: "08:00-17:00",
-      thursday: "08:00-17:00",
-      friday: "08:00-16:00",
-      saturday: "09:00-13:00",
-      sunday: "Closed",
-    },
-    contacts: {
-      phone: "0115550137",
-      email: "krugersdorp@bank.co.za",
-    },
-    rating: 4.0,
-    isOpen: false,
-    busyTimes: {
-      Monday: [
-        { time: "12:00", level: "Moderate" },
-        { time: "15:00", level: "Moderate" }
-      ],
-    },
-    imageUrl: null,
-    notes: null,
-  },
-
-  {
-    id: "38",
-    name: "Alberton Branch",
-    province: "Gauteng",
-    address: {
-      street: "10 Voortrekker Road",
-      suburb: "Alberton North",
-      city: "Alberton",
-      province: "Gauteng",
-      postalCode: "1449",
-    },
-    coordinates: {
-      latitude: -26.2669,
-      longitude: 28.1219,
-    },
-    languages: ["English", "Zulu", "Afrikaans"],
-    facilities: ["Parking", "ATM", "Wheelchair Access"],
-    services: ["Savings", "Insurance", "Account Opening"],
-    operatingHours: {
-      monday: "08:00-17:00",
-      tuesday: "08:00-17:00",
-      wednesday: "08:00-17:00",
-      thursday: "08:00-17:00",
-      friday: "08:00-16:00",
-      saturday: "09:00-13:00",
-      sunday: "Closed",
-    },
-    contacts: {
-      phone: "0115550138",
-      email: "alberton@bank.co.za",
-    },
-    rating: 4.3,
-    isOpen: true,
-    busyTimes: {
-      Monday: [
-        { time: "11:00", level: "Very Busy" },
-        { time: "14:00", level: "Very Busy" },
-        { time: "15:00", level: "Moderate" }
-      ],
-    },
-    imageUrl: null,
-    notes: null,
-  },
-
-  {
-    id: "39",
     name: "Paarl Branch",
     province: "Western Cape",
-    address: {
-      street: "90 Main Street",
-      suburb: "Paarl Central",
-      city: "Paarl",
-      province: "Western Cape",
-      postalCode: "7646",
-    },
-    coordinates: {
-      latitude: -33.7342,
-      longitude: 18.9621,
-    },
-    languages: ["English", "Afrikaans", "Xhosa"],
-    facilities: ["Parking", "ATM"],
-    services: ["Savings", "Loans"],
-    operatingHours: {
-      monday: "08:00-17:00",
-      tuesday: "08:00-17:00",
-      wednesday: "08:00-17:00",
-      thursday: "08:00-17:00",
-      friday: "08:00-16:00",
-      saturday: "09:00-13:00",
-      sunday: "Closed",
-    },
-    contacts: {
-      phone: "0215550139",
-      email: "paarl@bank.co.za",
-    },
-    rating: 4.3,
-    isOpen: true,
-    busyTimes: {
-      Monday: [
-        { time: "09:00", level: "Very Busy" },
-        { time: "13:00", level: "Busy" },
-        { time: "16:00", level: "Very Busy" }
-      ],
-    },
-    imageUrl: null,
-    notes: null,
+    street: "90 Main Street",
+    suburb: "Paarl Central",
+    city: "Paarl",
+    postalCode: "7646",
+    latitude: -33.7342,
+    longitude: 18.9621,
+    phonePrefix: "021",
   },
-
   {
-    id: "40",
     name: "Mitchells Plain Branch",
     province: "Western Cape",
-    address: {
-      street: "1 AZ Berman Drive",
-      suburb: "Town Centre",
-      city: "Cape Town",
-      province: "Western Cape",
-      postalCode: "7785",
-    },
-    coordinates: {
-      latitude: -34.0378,
-      longitude: 18.6182,
-    },
-    languages: ["English", "Afrikaans", "Xhosa"],
-    facilities: ["ATM", "Parking", "Wheelchair Access"],
-    services: ["Savings", "Account Opening"],
-    operatingHours: {
-      monday: "08:00-17:00",
-      tuesday: "08:00-17:00",
-      wednesday: "08:00-17:00",
-      thursday: "08:00-17:00",
-      friday: "08:00-16:00",
-      saturday: "09:00-13:00",
-      sunday: "Closed",
-    },
-    contacts: {
-      phone: "0215550140",
-      email: "mitchellsplain@bank.co.za",
-    },
-    rating: 4.0,
-    isOpen: true,
-    busyTimes: {
-      Monday: [
-        { time: "14:00", level: "Quiet" },
-        { time: "15:00", level: "Quiet" }
-      ],
-    },
-    imageUrl: null,
-    notes: null,
+    street: "1 AZ Berman Drive",
+    suburb: "Town Centre",
+    city: "Cape Town",
+    postalCode: "7785",
+    latitude: -34.0378,
+    longitude: 18.6182,
+    phonePrefix: "021",
   },
 
+  // KwaZulu-Natal
   {
-    id: "41",
-    name: "Worcester Branch",
-    province: "Western Cape",
-    address: {
-      street: "33 High Street",
-      suburb: "Worcester Central",
-      city: "Worcester",
-      province: "Western Cape",
-      postalCode: "6849",
-    },
-    coordinates: {
-      latitude: -33.6464,
-      longitude: 19.4483,
-    },
-    languages: ["English", "Afrikaans"],
-    facilities: ["ATM", "Parking"],
-    services: ["Loans", "Savings", "Insurance"],
-    operatingHours: {
-      monday: "08:00-17:00",
-      tuesday: "08:00-17:00",
-      wednesday: "08:00-17:00",
-      thursday: "08:00-17:00",
-      friday: "08:00-16:00",
-      saturday: "09:00-13:00",
-      sunday: "Closed",
-    },
-    contacts: {
-      phone: "0235550141",
-      email: "worcester@bank.co.za",
-    },
-    rating: 3.8,
-    isOpen: true,
-    busyTimes: {
-      Monday: [
-        { time: "08:00", level: "Busy" },
-        { time: "14:00", level: "Quiet" }
-      ],
-    },
-    imageUrl: null,
-    notes: null,
+    name: "Durban Central Branch",
+    province: "KwaZulu-Natal",
+    street: "101 Dr Pixley KaSeme Street",
+    suburb: "CBD",
+    city: "Durban",
+    postalCode: "4001",
+    latitude: -29.8587,
+    longitude: 31.0218,
+    phonePrefix: "031",
   },
-
   {
-    id: "42",
+    name: "Umhlanga Branch",
+    province: "KwaZulu-Natal",
+    street: "1 Lighthouse Road",
+    suburb: "Umhlanga",
+    city: "Durban",
+    postalCode: "4320",
+    latitude: -29.7266,
+    longitude: 31.0845,
+    phonePrefix: "031",
+  },
+  {
+    name: "Pietermaritzburg Branch",
+    province: "KwaZulu-Natal",
+    street: "210 Church Street",
+    suburb: "CBD",
+    city: "Pietermaritzburg",
+    postalCode: "3201",
+    latitude: -29.6006,
+    longitude: 30.3794,
+    phonePrefix: "033",
+  },
+  {
+    name: "Ballito Branch",
+    province: "KwaZulu-Natal",
+    street: "10 Ballito Drive",
+    suburb: "Ballito Central",
+    city: "Ballito",
+    postalCode: "4420",
+    latitude: -29.5385,
+    longitude: 31.2141,
+    phonePrefix: "032",
+  },
+  {
+    name: "Newcastle Branch",
+    province: "KwaZulu-Natal",
+    street: "55 Murchison Street",
+    suburb: "Newcastle Central",
+    city: "Newcastle",
+    postalCode: "2940",
+    latitude: -27.7573,
+    longitude: 29.9319,
+    phonePrefix: "034",
+  },
+  {
     name: "Richards Bay Branch",
     province: "KwaZulu-Natal",
-    address: {
-      street: "7 Krail Street",
-      suburb: "CBD",
-      city: "Richards Bay",
-      province: "KwaZulu-Natal",
-      postalCode: "3900",
-    },
-    coordinates: {
-      latitude: -28.7807,
-      longitude: 32.0383,
-    },
-    languages: ["English", "Zulu"],
-    facilities: ["Parking", "ATM", "WiFi"],
-    services: ["Loans", "Savings", "Insurance"],
-    operatingHours: {
-      monday: "08:00-17:00",
-      tuesday: "08:00-17:00",
-      wednesday: "08:00-17:00",
-      thursday: "08:00-17:00",
-      friday: "08:00-16:00",
-      saturday: "09:00-13:00",
-      sunday: "Closed",
-    },
-    contacts: {
-      phone: "0355550142",
-      email: "richardsbay@bank.co.za",
-    },
-    rating: 4.2,
-    isOpen: true,
-    busyTimes: {
-      Monday: [
-        { time: "11:00", level: "Moderate" },
-        { time: "16:00", level: "Very Busy" }
-      ],
-    },
-    imageUrl: null,
-    notes: null,
+    street: "7 Krail Street",
+    suburb: "CBD",
+    city: "Richards Bay",
+    postalCode: "3900",
+    latitude: -28.7807,
+    longitude: 32.0383,
+    phonePrefix: "035",
   },
-
   {
-    id: "43",
-    name: "Chatsworth Branch",
+    name: "Westville Branch",
     province: "KwaZulu-Natal",
-    address: {
-      street: "12 Higginson Highway",
-      suburb: "Chatsworth Centre",
-      city: "Durban",
-      province: "KwaZulu-Natal",
-      postalCode: "4030",
-    },
-    coordinates: {
-      latitude: -29.9167,
-      longitude: 30.8833,
-    },
-    languages: ["English", "Zulu", "Afrikaans"],
-    facilities: ["ATM", "Parking", "Wheelchair Access"],
-    services: ["Savings", "Account Opening"],
-    operatingHours: {
-      monday: "08:00-17:00",
-      tuesday: "08:00-17:00",
-      wednesday: "08:00-17:00",
-      thursday: "08:00-17:00",
-      friday: "08:00-16:00",
-      saturday: "09:00-13:00",
-      sunday: "Closed",
-    },
-    contacts: {
-      phone: "0315550143",
-      email: "chatsworth@bank.co.za",
-    },
-    rating: 4.1,
-    isOpen: true,
-    busyTimes: {
-      Monday: [
-        { time: "10:00", level: "Moderate" },
-        { time: "14:00", level: "Busy" }
-      ],
-    },
-    imageUrl: null,
-    notes: null,
+    street: "35 Jan Hofmeyr Road",
+    suburb: "Westville",
+    city: "Durban",
+    postalCode: "3629",
+    latitude: -29.8291,
+    longitude: 30.9258,
+    phonePrefix: "031",
   },
 
+  // Eastern Cape
   {
-    id: "44",
+    name: "Gqeberha Branch",
+    province: "Eastern Cape",
+    street: "25 Govan Mbeki Avenue",
+    suburb: "Central",
+    city: "Gqeberha",
+    postalCode: "6001",
+    latitude: -33.9608,
+    longitude: 25.6022,
+    phonePrefix: "041",
+  },
+  {
+    name: "East London Branch",
+    province: "Eastern Cape",
+    street: "33 Oxford Street",
+    suburb: "CBD",
+    city: "East London",
+    postalCode: "5201",
+    latitude: -33.0153,
+    longitude: 27.9116,
+    phonePrefix: "043",
+  },
+  {
+    name: "Mthatha Branch",
+    province: "Eastern Cape",
+    street: "14 Sutherland Street",
+    suburb: "CBD",
+    city: "Mthatha",
+    postalCode: "5099",
+    latitude: -31.5889,
+    longitude: 28.7844,
+    phonePrefix: "047",
+  },
+  {
     name: "Queenstown Branch",
     province: "Eastern Cape",
-    address: {
-      street: "40 Cathcart Road",
-      suburb: "CBD",
-      city: "Queenstown",
-      province: "Eastern Cape",
-      postalCode: "5320",
-    },
-    coordinates: {
-      latitude: -31.8976,
-      longitude: 26.8753,
-    },
-    languages: ["English", "Xhosa", "Afrikaans"],
-    facilities: ["ATM", "Parking"],
-    services: ["Savings", "Loans"],
-    operatingHours: {
-      monday: "08:00-17:00",
-      tuesday: "08:00-17:00",
-      wednesday: "08:00-17:00",
-      thursday: "08:00-17:00",
-      friday: "08:00-16:00",
-      saturday: "09:00-13:00",
-      sunday: "Closed",
-    },
-    contacts: {
-      phone: "0455550144",
-      email: "queenstown@bank.co.za",
-    },
-    rating: 3.9,
-    isOpen: true,
-    busyTimes: {
-      Monday: [
-        { time: "11:00", level: "Quiet" },
-        { time: "15:00", level: "Very Busy" }
-      ],
-    },
-    imageUrl: null,
-    notes: null,
+    street: "40 Cathcart Road",
+    suburb: "CBD",
+    city: "Queenstown",
+    postalCode: "5320",
+    latitude: -31.8976,
+    longitude: 26.8753,
+    phonePrefix: "045",
   },
-
   {
-    id: "45",
-    name: "Uitenhage Branch",
+    name: "Kariega Branch",
     province: "Eastern Cape",
-    address: {
-      street: "18 Caledon Street",
-      suburb: "CBD",
-      city: "Kariega",
-      province: "Eastern Cape",
-      postalCode: "6229",
-    },
-    coordinates: {
-      latitude: -33.7614,
-      longitude: 25.3967,
-    },
-    languages: ["English", "Xhosa", "Afrikaans"],
-    facilities: ["Parking", "ATM", "Wheelchair Access"],
-    services: ["Loans", "Savings", "Insurance"],
-    operatingHours: {
-      monday: "08:00-17:00",
-      tuesday: "08:00-17:00",
-      wednesday: "08:00-17:00",
-      thursday: "08:00-17:00",
-      friday: "08:00-16:00",
-      saturday: "09:00-13:00",
-      sunday: "Closed",
-    },
-    contacts: {
-      phone: "0415550145",
-      email: "uitenhage@bank.co.za",
-    },
-    rating: 4.0,
-    isOpen: false,
-    busyTimes: {
-      Monday: [
-        { time: "09:00", level: "Quiet" },
-        { time: "16:00", level: "Quiet" }
-      ],
-    },
-    imageUrl: null,
-    notes: null,
+    street: "18 Caledon Street",
+    suburb: "CBD",
+    city: "Kariega",
+    postalCode: "6229",
+    latitude: -33.7614,
+    longitude: 25.3967,
+    phonePrefix: "041",
+  },
+  {
+    name: "Makhanda Branch",
+    province: "Eastern Cape",
+    street: "8 High Street",
+    suburb: "Makhanda Central",
+    city: "Makhanda",
+    postalCode: "6139",
+    latitude: -33.3106,
+    longitude: 26.5256,
+    phonePrefix: "046",
+  },
+  {
+    name: "Jeffreys Bay Branch",
+    province: "Eastern Cape",
+    street: "22 Da Gama Road",
+    suburb: "Jeffreys Bay Central",
+    city: "Jeffreys Bay",
+    postalCode: "6330",
+    latitude: -34.0507,
+    longitude: 24.9145,
+    phonePrefix: "042",
   },
 
+  // Free State
   {
-    id: "46",
+    name: "Bloemfontein Branch",
+    province: "Free State",
+    street: "155 Nelson Mandela Drive",
+    suburb: "Westdene",
+    city: "Bloemfontein",
+    postalCode: "9301",
+    latitude: -29.1183,
+    longitude: 26.2299,
+    phonePrefix: "051",
+  },
+  {
+    name: "Welkom Branch",
+    province: "Free State",
+    street: "22 Stateway",
+    suburb: "Welkom Central",
+    city: "Welkom",
+    postalCode: "9459",
+    latitude: -27.9789,
+    longitude: 26.7362,
+    phonePrefix: "057",
+  },
+  {
     name: "Sasolburg Branch",
     province: "Free State",
-    address: {
-      street: "9 Fichardt Street",
-      suburb: "CBD",
-      city: "Sasolburg",
-      province: "Free State",
-      postalCode: "1947",
-    },
-    coordinates: {
-      latitude: -26.8146,
-      longitude: 27.8156,
-    },
-    languages: ["English", "Afrikaans", "Sotho"],
-    facilities: ["ATM", "Parking"],
-    services: ["Savings", "Account Opening"],
-    operatingHours: {
-      monday: "08:00-17:00",
-      tuesday: "08:00-17:00",
-      wednesday: "08:00-17:00",
-      thursday: "08:00-17:00",
-      friday: "08:00-16:00",
-      saturday: "09:00-13:00",
-      sunday: "Closed",
-    },
-    contacts: {
-      phone: "0165550146",
-      email: "sasolburg@bank.co.za",
-    },
-    rating: 3.8,
-    isOpen: true,
-    busyTimes: {
-      Monday: [
-        { time: "09:00", level: "Moderate" },
-        { time: "11:00", level: "Very Busy" }
-      ],
-    },
-    imageUrl: null,
-    notes: null,
+    street: "9 Fichardt Street",
+    suburb: "CBD",
+    city: "Sasolburg",
+    postalCode: "1947",
+    latitude: -26.8146,
+    longitude: 27.8156,
+    phonePrefix: "016",
+  },
+  {
+    name: "Bethlehem Branch",
+    province: "Free State",
+    street: "20 Commissioner Street",
+    suburb: "Bethlehem Central",
+    city: "Bethlehem",
+    postalCode: "9701",
+    latitude: -28.2308,
+    longitude: 28.3071,
+    phonePrefix: "058",
+  },
+  {
+    name: "Kroonstad Branch",
+    province: "Free State",
+    street: "12 Cross Street",
+    suburb: "Kroonstad Central",
+    city: "Kroonstad",
+    postalCode: "9499",
+    latitude: -27.6505,
+    longitude: 27.2349,
+    phonePrefix: "056",
+  },
+  {
+    name: "Parys Branch",
+    province: "Free State",
+    street: "9 Bree Street",
+    suburb: "Parys Central",
+    city: "Parys",
+    postalCode: "9585",
+    latitude: -26.9033,
+    longitude: 27.4573,
+    phonePrefix: "056",
   },
 
+  // Limpopo
   {
-    id: "47",
+    name: "Polokwane Branch",
+    province: "Limpopo",
+    street: "45 Market Street",
+    suburb: "CBD",
+    city: "Polokwane",
+    postalCode: "0700",
+    latitude: -23.9045,
+    longitude: 29.4689,
+    phonePrefix: "015",
+  },
+  {
+    name: "Tzaneen Branch",
+    province: "Limpopo",
+    street: "8 Danie Joubert Street",
+    suburb: "Tzaneen Central",
+    city: "Tzaneen",
+    postalCode: "0850",
+    latitude: -23.8339,
+    longitude: 30.1633,
+    phonePrefix: "015",
+  },
+  {
     name: "Thohoyandou Branch",
     province: "Limpopo",
-    address: {
-      street: "3 University Road",
-      suburb: "CBD",
-      city: "Thohoyandou",
-      province: "Limpopo",
-      postalCode: "0950",
-    },
-    coordinates: {
-      latitude: -22.9767,
-      longitude: 30.4842,
-    },
-    languages: ["English", "Tshivenda", "Xitsonga"],
-    facilities: ["ATM", "Parking", "Wheelchair Access"],
-    services: ["Savings", "Loans"],
-    operatingHours: {
-      monday: "08:00-17:00",
-      tuesday: "08:00-17:00",
-      wednesday: "08:00-17:00",
-      thursday: "08:00-17:00",
-      friday: "08:00-16:00",
-      saturday: "09:00-13:00",
-      sunday: "Closed",
-    },
-    contacts: {
-      phone: "0155550147",
-      email: "thohoyandou@bank.co.za",
-    },
-    rating: 4.1,
-    isOpen: true,
-    busyTimes: {
-      Monday: [
-        { time: "15:00", level: "Moderate" },
-        { time: "16:00", level: "Very Busy" }
-      ],
-    },
-    imageUrl: null,
-    notes: null,
+    street: "3 University Road",
+    suburb: "CBD",
+    city: "Thohoyandou",
+    postalCode: "0950",
+    latitude: -22.9767,
+    longitude: 30.4842,
+    phonePrefix: "015",
+  },
+  {
+    name: "Mokopane Branch",
+    province: "Limpopo",
+    street: "25 Nelson Mandela Drive",
+    suburb: "Mokopane Central",
+    city: "Mokopane",
+    postalCode: "0601",
+    latitude: -24.1944,
+    longitude: 29.0097,
+    phonePrefix: "015",
+  },
+  {
+    name: "Bela-Bela Branch",
+    province: "Limpopo",
+    street: "7 Chris Hani Way",
+    suburb: "Bela-Bela Central",
+    city: "Bela-Bela",
+    postalCode: "0480",
+    latitude: -24.8833,
+    longitude: 28.2833,
+    phonePrefix: "014",
+  },
+  {
+    name: "Giyani Branch",
+    province: "Limpopo",
+    street: "5 Main Road",
+    suburb: "Giyani Central",
+    city: "Giyani",
+    postalCode: "0826",
+    latitude: -23.3025,
+    longitude: 30.7187,
+    phonePrefix: "015",
   },
 
+  // Mpumalanga
   {
-    id: "48",
+    name: "Mbombela Branch",
+    province: "Mpumalanga",
+    street: "19 Louis Trichardt Street",
+    suburb: "Nelspruit Central",
+    city: "Mbombela",
+    postalCode: "1200",
+    latitude: -25.4753,
+    longitude: 30.9694,
+    phonePrefix: "013",
+  },
+  {
+    name: "eMalahleni Branch",
+    province: "Mpumalanga",
+    street: "5 Mandela Street",
+    suburb: "CBD",
+    city: "eMalahleni",
+    postalCode: "1035",
+    latitude: -25.8749,
+    longitude: 29.2325,
+    phonePrefix: "013",
+  },
+  {
     name: "Secunda Branch",
     province: "Mpumalanga",
-    address: {
-      street: "15 Horwood Street",
-      suburb: "CBD",
-      city: "Secunda",
-      province: "Mpumalanga",
-      postalCode: "2302",
-    },
-    coordinates: {
-      latitude: -26.5225,
-      longitude: 29.1739,
-    },
-    languages: ["English", "Zulu", "Afrikaans"],
-    facilities: ["Parking", "ATM"],
-    services: ["Loans", "Savings", "Insurance"],
-    operatingHours: {
-      monday: "08:00-17:00",
-      tuesday: "08:00-17:00",
-      wednesday: "08:00-17:00",
-      thursday: "08:00-17:00",
-      friday: "08:00-16:00",
-      saturday: "09:00-13:00",
-      sunday: "Closed",
-    },
-    contacts: {
-      phone: "0175550148",
-      email: "secunda@bank.co.za",
-    },
-    rating: 4.0,
-    isOpen: true,
-    busyTimes: {
-      Monday: [
-        { time: "08:00", level: "Very Busy" },
-        { time: "10:00", level: "Quiet" }
-      ],
-    },
-    imageUrl: null,
-    notes: null,
+    street: "15 Horwood Street",
+    suburb: "CBD",
+    city: "Secunda",
+    postalCode: "2302",
+    latitude: -26.5225,
+    longitude: 29.1739,
+    phonePrefix: "017",
+  },
+  {
+    name: "Middelburg Branch",
+    province: "Mpumalanga",
+    street: "20 Cowen Ntuli Street",
+    suburb: "Middelburg Central",
+    city: "Middelburg",
+    postalCode: "1050",
+    latitude: -25.7699,
+    longitude: 29.4648,
+    phonePrefix: "013",
+  },
+  {
+    name: "Ermelo Branch",
+    province: "Mpumalanga",
+    street: "16 Joubert Street",
+    suburb: "Ermelo Central",
+    city: "Ermelo",
+    postalCode: "2351",
+    latitude: -26.5333,
+    longitude: 29.9833,
+    phonePrefix: "017",
+  },
+  {
+    name: "Hazyview Branch",
+    province: "Mpumalanga",
+    street: "11 Main Road",
+    suburb: "Hazyview Central",
+    city: "Hazyview",
+    postalCode: "1242",
+    latitude: -25.0431,
+    longitude: 31.1277,
+    phonePrefix: "013",
   },
 
+  // North West
   {
-    id: "49",
+    name: "Rustenburg Branch",
+    province: "North West",
+    street: "14 Nelson Mandela Drive",
+    suburb: "CBD",
+    city: "Rustenburg",
+    postalCode: "0299",
+    latitude: -25.6672,
+    longitude: 27.2424,
+    phonePrefix: "014",
+  },
+  {
+    name: "Mahikeng Branch",
+    province: "North West",
+    street: "33 Nelson Mandela Drive",
+    suburb: "CBD",
+    city: "Mahikeng",
+    postalCode: "2745",
+    latitude: -25.8654,
+    longitude: 25.6438,
+    phonePrefix: "018",
+  },
+  {
     name: "Klerksdorp Branch",
     province: "North West",
-    address: {
-      street: "28 Margaretha Prinsloo Street",
-      suburb: "CBD",
-      city: "Klerksdorp",
-      province: "North West",
-      postalCode: "2570",
-    },
-    coordinates: {
-      latitude: -26.8523,
-      longitude: 26.6667,
-    },
-    languages: ["English", "Afrikaans", "Setswana"],
-    facilities: ["ATM", "Parking", "Wheelchair Access"],
-    services: ["Savings", "Loans", "Account Opening"],
-    operatingHours: {
-      monday: "08:00-17:00",
-      tuesday: "08:00-17:00",
-      wednesday: "08:00-17:00",
-      thursday: "08:00-17:00",
-      friday: "08:00-16:00",
-      saturday: "09:00-13:00",
-      sunday: "Closed",
-    },
-    contacts: {
-      phone: "0185550149",
-      email: "klerksdorp@bank.co.za",
-    },
-    rating: 4.2,
-    isOpen: true,
-    busyTimes: {
-      Monday: [
-        { time: "12:00", level: "Very Busy" },
-        { time: "14:00", level: "Busy" }
-      ],
-    },
-    imageUrl: null,
-    notes: null,
+    street: "28 Margaretha Prinsloo Street",
+    suburb: "CBD",
+    city: "Klerksdorp",
+    postalCode: "2570",
+    latitude: -26.8523,
+    longitude: 26.6667,
+    phonePrefix: "018",
+  },
+  {
+    name: "Potchefstroom Branch",
+    province: "North West",
+    street: "55 Walter Sisulu Avenue",
+    suburb: "Potchefstroom Central",
+    city: "Potchefstroom",
+    postalCode: "2531",
+    latitude: -26.7145,
+    longitude: 27.097,
+    phonePrefix: "018",
+  },
+  {
+    name: "Brits Branch",
+    province: "North West",
+    street: "8 Murray Avenue",
+    suburb: "Brits Central",
+    city: "Brits",
+    postalCode: "0250",
+    latitude: -25.6347,
+    longitude: 27.7802,
+    phonePrefix: "012",
+  },
+  {
+    name: "Vryburg Branch",
+    province: "North West",
+    street: "10 Market Street",
+    suburb: "Vryburg Central",
+    city: "Vryburg",
+    postalCode: "8601",
+    latitude: -26.9566,
+    longitude: 24.7284,
+    phonePrefix: "053",
   },
 
+  // Northern Cape
   {
-    id: "50",
+    name: "Kimberley Branch",
+    province: "Northern Cape",
+    street: "7 Du Toitspan Road",
+    suburb: "CBD",
+    city: "Kimberley",
+    postalCode: "8301",
+    latitude: -28.7383,
+    longitude: 24.7642,
+    phonePrefix: "053",
+  },
+  {
+    name: "Upington Branch",
+    province: "Northern Cape",
+    street: "18 Schroder Street",
+    suburb: "CBD",
+    city: "Upington",
+    postalCode: "8801",
+    latitude: -28.4478,
+    longitude: 21.2561,
+    phonePrefix: "054",
+  },
+  {
     name: "Springbok Branch",
     province: "Northern Cape",
-    address: {
-      street: "11 Voortrekker Street",
-      suburb: "CBD",
-      city: "Springbok",
-      province: "Northern Cape",
-      postalCode: "8240",
-    },
-    coordinates: {
-      latitude: -29.6643,
-      longitude: 17.8865,
-    },
-    languages: ["English", "Afrikaans"],
-    facilities: ["ATM", "Parking"],
-    services: ["Savings", "Loans"],
-    operatingHours: {
-      monday: "08:00-17:00",
-      tuesday: "08:00-17:00",
-      wednesday: "08:00-17:00",
-      thursday: "08:00-17:00",
-      friday: "08:00-16:00",
-      saturday: "09:00-13:00",
-      sunday: "Closed",
-    },
-    contacts: {
-      phone: "0275550150",
-      email: "springbok@bank.co.za",
-    },
-    rating: 3.7,
-    isOpen: true,
-    busyTimes: {
-      Monday: [
-        { time: "14:00", level: "Moderate" },
-        { time: "15:00", level: "Moderate" }
-      ],
-    },
-    imageUrl: null,
-    notes: null,
+    street: "11 Voortrekker Street",
+    suburb: "CBD",
+    city: "Springbok",
+    postalCode: "8240",
+    latitude: -29.6643,
+    longitude: 17.8865,
+    phonePrefix: "027",
   },
-
   {
-    id: "51",
-    name: "Benoni Branch",
-    province: "Gauteng",
-    address: {
-      street: "66 Tom Jones Street",
-      suburb: "Benoni Central",
-      city: "Benoni",
-      province: "Gauteng",
-      postalCode: "1501",
-    },
-    coordinates: {
-      latitude: -26.1883,
-      longitude: 28.3208,
-    },
-    languages: ["English", "Zulu", "Afrikaans"],
-    facilities: ["Parking", "ATM", "WiFi"],
-    services: ["Loans", "Savings", "Insurance", "Account Opening"],
-    operatingHours: {
-      monday: "08:00-17:00",
-      tuesday: "08:00-17:00",
-      wednesday: "08:00-17:00",
-      thursday: "08:00-17:00",
-      friday: "08:00-16:00",
-      saturday: "09:00-13:00",
-      sunday: "Closed",
-    },
-    contacts: {
-      phone: "0115550151",
-      email: "benoni@bank.co.za",
-    },
-    rating: 4.3,
-    isOpen: true,
-    busyTimes: {
-      Monday: [
-        { time: "08:00", level: "Quiet" },
-        { time: "11:00", level: "Busy" },
-        { time: "12:00", level: "Quiet" }
-      ],
-    },
-    imageUrl: null,
-    notes: null,
+    name: "Kuruman Branch",
+    province: "Northern Cape",
+    street: "18 Main Street",
+    suburb: "Kuruman Central",
+    city: "Kuruman",
+    postalCode: "8460",
+    latitude: -27.4524,
+    longitude: 23.4325,
+    phonePrefix: "053",
   },
-
   {
-    id: "52",
-    name: "Somerset West Branch",
-    province: "Western Cape",
-    address: {
-      street: "41 Main Road",
-      suburb: "Somerset West Central",
-      city: "Cape Town",
-      province: "Western Cape",
-      postalCode: "7130",
-    },
-    coordinates: {
-      latitude: -34.0836,
-      longitude: 18.8503,
-    },
-    languages: ["English", "Afrikaans"],
-    facilities: ["Parking", "ATM", "Wheelchair Access"],
-    services: ["Savings", "Insurance", "Account Opening"],
-    operatingHours: {
-      monday: "08:00-17:00",
-      tuesday: "08:00-17:00",
-      wednesday: "08:00-17:00",
-      thursday: "08:00-17:00",
-      friday: "08:00-16:00",
-      saturday: "09:00-13:00",
-      sunday: "Closed",
-    },
-    contacts: {
-      phone: "0215550152",
-      email: "somersetwest@bank.co.za",
-    },
-    rating: 4.5,
-    isOpen: true,
-    busyTimes: {
-      Monday: [
-        { time: "08:00", level: "Moderate" },
-        { time: "12:00", level: "Quiet" },
-        { time: "15:00", level: "Quiet" }
-      ],
-    },
-    imageUrl: null,
-    notes: null,
+    name: "Kathu Branch",
+    province: "Northern Cape",
+    street: "16 Hendrik Van Eck Road",
+    suburb: "Kathu Central",
+    city: "Kathu",
+    postalCode: "8446",
+    latitude: -27.6957,
+    longitude: 23.0493,
+    phonePrefix: "053",
   },
-
   {
-    id: "53",
-    name: "Pinetown Branch",
-    province: "KwaZulu-Natal",
-    address: {
-      street: "17 Josiah Gumede Road",
-      suburb: "Pinetown Central",
-      city: "Durban",
-      province: "KwaZulu-Natal",
-      postalCode: "3610",
-    },
-    coordinates: {
-      latitude: -29.8153,
-      longitude: 30.8556,
-    },
-    languages: ["English", "Zulu", "Afrikaans"],
-    facilities: ["ATM", "Parking"],
-    services: ["Loans", "Savings"],
-    operatingHours: {
-      monday: "08:00-17:00",
-      tuesday: "08:00-17:00",
-      wednesday: "08:00-17:00",
-      thursday: "08:00-17:00",
-      friday: "08:00-16:00",
-      saturday: "09:00-13:00",
-      sunday: "Closed",
-    },
-    contacts: {
-      phone: "0315550153",
-      email: "pinetown@bank.co.za",
-    },
-    rating: 4.0,
-    isOpen: true,
-    busyTimes: {
-      Monday: [
-        { time: "09:00", level: "Quiet" },
-        { time: "10:00", level: "Moderate" }
-      ],
-    },
-    imageUrl: null,
-    notes: null,
-  }];
+    name: "De Aar Branch",
+    province: "Northern Cape",
+    street: "12 Voortrekker Street",
+    suburb: "De Aar Central",
+    city: "De Aar",
+    postalCode: "7000",
+    latitude: -30.6497,
+    longitude: 24.0123,
+    phonePrefix: "053",
+  },
+];
 
+function getListItem(list, index) {
+  return list[index % list.length];
+}
 
- function getDistanceInKm(lat1, lon1, lat2, lon2) {
+function createEmailName(value) {
+  return value
+    .toLowerCase()
+    .replace(" branch", "")
+    .replaceAll(" ", "")
+    .replaceAll("-", "")
+    .replaceAll("'", "");
+}
+
+function createBusyTimes(index) {
+  return {
+    Monday: [
+      {
+        time: "09:00",
+        level: getListItem(BUSY_LEVELS, index),
+      },
+      {
+        time: "12:00",
+        level: getListItem(BUSY_LEVELS, index + 1),
+      },
+      {
+        time: "15:00",
+        level: getListItem(BUSY_LEVELS, index + 2),
+      },
+    ],
+  };
+}
+
+function generateMockBranches(count = 60) {
+  return BRANCH_LOCATIONS.slice(0, count).map((location, index) => {
+    const id = String(index + 1);
+    const facilities = getListItem(FACILITY_SETS, index);
+    const services = getListItem(SERVICE_SETS, index);
+    const emailName = createEmailName(location.name);
+
+    return {
+      id,
+      name: location.name,
+      province: location.province,
+      address: {
+        street: location.street,
+        suburb: location.suburb,
+        city: location.city,
+        province: location.province,
+        postalCode: location.postalCode,
+      },
+      coordinates: {
+        latitude: location.latitude,
+        longitude: location.longitude,
+      },
+      languages: PROVINCE_LANGUAGES[location.province],
+      facilities,
+      services,
+      operatingHours: DEFAULT_OPERATING_HOURS,
+      contacts: {
+        phone: `${location.phonePrefix}555${String(index + 1).padStart(4, "0")}`,
+        email: `${emailName}@bank.co.za`,
+      },
+      rating: Number((3.7 + (index % 13) * 0.1).toFixed(1)),
+      isOpen: index % 7 !== 0,
+      busyTimes: createBusyTimes(index),
+      imageUrl: null,
+      notes: null,
+    };
+  });
+}
+
+const branches = generateMockBranches(60);
+
+function getDistanceInKm(lat1, lon1, lat2, lon2) {
   const earthRadius = 6371;
 
   const dLat = ((lat2 - lat1) * Math.PI) / 180;
@@ -2323,19 +816,27 @@ const branches = [
 
   return Number((earthRadius * c).toFixed(1));
 }
-/* ------------------------------------------------------------------
-   Branch Locator Mock Endpoints
--------------------------------------------------------------------*/
+
+function getBranchSummary(branch) {
+  return {
+    id: branch.id,
+    name: branch.name,
+    province: branch.province,
+    coordinates: branch.coordinates,
+    address: `${branch.address.street}, ${branch.address.city}`,
+    rating: branch.rating,
+    isOpen: branch.isOpen,
+  };
+}
 
 export const branchLocatorService = [
-
-      /**
+  /**
    * ------------------------------------------------------------------
    * GET /v1/branches
    * ------------------------------------------------------------------
    */
   http.get(API_PATHS.BRANCHES, async ({ request }) => {
-    await delay(800);
+    await delay(150);
 
     const url = new URL(request.url);
 
@@ -2372,30 +873,32 @@ export const branchLocatorService = [
     const search = url.searchParams.get("search");
 
     const page = Number(url.searchParams.get("page") || 1);
-    const pageSize = Number(url.searchParams.get("pageSize") || 20);
+    const pageSize = Number(
+      url.searchParams.get("pageSize") || branches.length,
+    );
 
-    let filtered = [...branches];
+    let filteredBranches = [...branches];
 
     if (province) {
-      filtered = filtered.filter(
+      filteredBranches = filteredBranches.filter(
         (branch) => branch.province === province,
       );
     }
 
     if (language) {
-      filtered = filtered.filter((branch) =>
+      filteredBranches = filteredBranches.filter((branch) =>
         branch.languages.includes(language),
       );
     }
 
     if (facility) {
-      filtered = filtered.filter((branch) =>
+      filteredBranches = filteredBranches.filter((branch) =>
         branch.facilities.includes(facility),
       );
     }
 
     if (service) {
-      filtered = filtered.filter((branch) =>
+      filteredBranches = filteredBranches.filter((branch) =>
         branch.services.includes(service),
       );
     }
@@ -2403,124 +906,119 @@ export const branchLocatorService = [
     if (search) {
       const value = search.toLowerCase();
 
-      filtered = filtered.filter(
+      filteredBranches = filteredBranches.filter(
         (branch) =>
           branch.name.toLowerCase().includes(value) ||
-          branch.address.city.toLowerCase().includes(value) ||
-          branch.address.suburb
-            ?.toLowerCase()
-            .includes(value),
+          branch.province.toLowerCase().includes(value) ||
+          branch.address.street.toLowerCase().includes(value) ||
+          branch.address.suburb.toLowerCase().includes(value) ||
+          branch.address.city.toLowerCase().includes(value),
       );
     }
 
-    const total = filtered.length;
-
+    const total = filteredBranches.length;
     const start = (page - 1) * pageSize;
-
     const end = start + pageSize;
 
-    const paginatedBranches = filtered.slice(start, end);
+    const paginatedBranches = filteredBranches.slice(start, end);
 
     return HttpResponse.json({
       success: true,
-      branches: paginatedBranches.map((branch) => ({
-        id: branch.id,
-        name: branch.name,
-        province: branch.province,
-        coordinates: branch.coordinates,
-        address: `${branch.address.street}, ${branch.address.city}`,
-        rating: branch.rating,
-        isOpen: branch.isOpen,
-      })),
+      branches: paginatedBranches.map(getBranchSummary),
       total,
       page,
       pageSize,
     });
   }),
-/**
- * ------------------------------------------------------------------
- * POST /v1/branches/search
- * ------------------------------------------------------------------
- */
-http.post(API_PATHS.BRANCH_SEARCH, async ({ request }) => {
-  await delay(500);
 
-  const body = await request.json();
+  /**
+   * ------------------------------------------------------------------
+   * POST /v1/branches/search
+   * ------------------------------------------------------------------
+   */
+  http.post(API_PATHS.BRANCH_SEARCH, async ({ request }) => {
+    await delay(150);
 
-  const { latitude, longitude } = body.coordinates;
+    const body = await request.json();
 
-  const nearestBranches = branches
-    .map((branch) => ({
-      id: branch.id,
-      name: branch.name,
-      province: branch.province,
-      coordinates: branch.coordinates,
-      address: `${branch.address.street}, ${branch.address.city}`,
-      rating: branch.rating,
-      isOpen: branch.isOpen,
+    const latitude = body?.coordinates?.latitude;
+    const longitude = body?.coordinates?.longitude;
 
-      distance: getDistanceInKm(
-        latitude,
-        longitude,
-        branch.coordinates.latitude,
-        branch.coordinates.longitude,
-      ),
-    }))
-    .sort((a, b) => a.distance - b.distance);
+    if (latitude === undefined || longitude === undefined) {
+      return HttpResponse.json(
+        {
+          success: false,
+          message: "Coordinates are required.",
+        },
+        {
+          status: 400,
+        },
+      );
+    }
 
-  return HttpResponse.json({
-    success: true,
-    branches: nearestBranches,
-  });
-}),
+    const nearestBranches = branches
+      .map((branch) => ({
+        ...getBranchSummary(branch),
+        distance: getDistanceInKm(
+          latitude,
+          longitude,
+          branch.coordinates.latitude,
+          branch.coordinates.longitude,
+        ),
+      }))
+      .sort((a, b) => a.distance - b.distance);
+
+    return HttpResponse.json({
+      success: true,
+      branches: nearestBranches,
+      total: nearestBranches.length,
+    });
+  }),
+
   /**
    * ------------------------------------------------------------------
    * GET /v1/branches/:branchId
    * ------------------------------------------------------------------
    */
-  http.get(
-    `${API_PATHS.BRANCHES}/:branchId`,
-    async ({ params, request }) => {
-      await delay(600);
+  http.get(`${API_PATHS.BRANCHES}/:branchId`, async ({ params, request }) => {
+    await delay(150);
 
-      const url = new URL(request.url);
+    const url = new URL(request.url);
+    const simulateError = url.searchParams.get("simulateError");
 
-      const simulateError =
-        url.searchParams.get("simulateError");
-
-      if (simulateError === "500") {
-        return HttpResponse.json(
-          {
-            success: false,
-            message: "Internal server error.",
-          },
-          {
-            status: 500,
-          },
-        );
-      }
-
-      const branch = branches.find(
-        (branch) => branch.id === params.branchId,
+    if (simulateError === "404") {
+      return HttpResponse.json(
+        {
+          success: false,
+          message: "Branch not found.",
+        },
+        {
+          status: 404,
+        },
       );
+    }
 
-      if (!branch) {
-        return HttpResponse.json(
-          {
-            success: false,
-            message: "Branch not found.",
-          },
-          {
-            status: 404,
-          },
-        );
-      }
+    const branch = branches.find(
+      (item) => item.id === params.branchId,
+    );
 
-      return HttpResponse.json({
-        success: true,
-        ...branch,
-      });
-    },
-  ),
+    if (!branch) {
+      return HttpResponse.json(
+        {
+          success: false,
+          message: "Branch not found.",
+        },
+        {
+          status: 404,
+        },
+      );
+    }
+
+    return HttpResponse.json({
+      success: true,
+      ...branch,
+    });
+  }),
 ];
+
 export const worker = setupWorker(...branchLocatorService);

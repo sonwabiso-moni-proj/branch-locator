@@ -1,94 +1,67 @@
 .branch-list {
-
-    width: 35%;
-
-    height: 500px;
-
-    overflow-y: auto;
-
-    background: white;
-
-    border-radius: 16px;
-
-    border: 1px solid #e2e8f0;
-
-    box-shadow: 0 4px 18px rgba(0,0,0,.08);
-
-    padding: 20px;
+  width: 360px;
+  max-height: 650px;
+  padding: 16px;
+  border-radius: 20px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  overflow-y: auto;
 }
 
-.branch-list h2{
-
-    margin-top:0;
-
-    margin-bottom:20px;
-
-    color:#1e293b;
+.branch-list h2 {
+  margin-bottom: 16px;
 }
 
-.branch-card{
-
-    padding:18px;
-
-    border:1px solid #e2e8f0;
-
-    border-radius:12px;
-
-    margin-bottom:15px;
-
-    cursor:pointer;
-
-    transition:.2s;
+.branch-card {
+  width: 100%;
+  display: block;
+  text-align: left;
+  padding: 16px;
+  margin-bottom: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  background: #ffffff;
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
 }
 
-.branch-card:hover{
-
-    transform:translateY(-2px);
-
-    box-shadow:0 6px 18px rgba(0,0,0,.08);
-
-    border-color:#16a34a;
+.branch-card:hover {
+  border-color: #00a651;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  transform: translateY(-1px);
 }
 
-.branch-card h3{
-
-    margin:0 0 8px;
-
-    font-size:17px;
-
-    color:#0f172a;
+.branch-card-selected {
+  border-color: #00a651;
+  box-shadow: 0 0 0 3px rgba(0, 166, 81, 0.15);
 }
 
-.branch-card p{
-
-    margin:4px 0;
-
-    color:#64748b;
-
-    font-size:14px;
+.branch-card h3 {
+  margin: 0;
+  font-size: 16px;
 }
 
-.branch-footer{
-
-    margin-top:12px;
-
-    display:flex;
-
-    justify-content:space-between;
-
-    align-items:center;
+.branch-card p {
+  margin: 4px 0;
+  font-size: 14px;
 }
 
-.status-open{
-
-    color:#16a34a;
-
-    font-weight:600;
+.status-open {
+  color: #008542;
+  font-size: 13px;
+  font-weight: 600;
 }
 
-.status-closed{
+.status-closed {
+  color: #dc2626;
+  font-size: 13px;
+  font-weight: 600;
+}
 
-    color:#dc2626;
-
-    font-weight:600;
+.branch-footer {
+  margin-top: 10px;
+  font-size: 14px;
 }

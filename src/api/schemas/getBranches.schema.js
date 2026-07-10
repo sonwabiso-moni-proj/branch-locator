@@ -25,8 +25,8 @@ export const GetBranchesRequestSchema = z.object({
     .number()
     .int()
     .positive()
-    .max(50)
-    .default(20),
+    .max(100)
+    .default(60),
 });
 
 /*

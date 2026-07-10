@@ -27,33 +27,30 @@ export default function SearchBar({
     }
 
     setLoadingLocation(true);
+navigator.geolocation.getCurrentPosition(
+  (position) => {
+    const coordinates = {
+      latitude: position.coords.latitude,
+      longitude: position.coords.longitude,
+    };
 
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const coordinates = {
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
-        };
+    if (onLocationFound) {
+      onLocationFound(coordinates);
+    }
 
-        console.log("Current Location:", coordinates);
-
-        if (onLocationFound) {
-          onLocationFound(coordinates);
-        }
-
-        setLoadingLocation(false);
-      },
-      (error) => {
-        console.error(error);
-
-        alert("Unable to retrieve your location.");
-
-        setLoadingLocation(false);
-      },
-      {
-        enableHighAccuracy: true,
-      },
-    );
+    setLoadingLocation(false);
+  },
+  (error) => {
+    console.error(error);
+    alert("Unable to retrieve your location.");
+    setLoadingLocation(false);
+  },
+  {
+    enableHighAccuracy: false,
+    timeout: 5000,
+    maximumAge: 60000,
+  },
+);
   }
 
   return (
