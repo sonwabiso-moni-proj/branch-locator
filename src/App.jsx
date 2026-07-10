@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import "./App.css";
 
@@ -7,6 +7,7 @@ import BranchList from "./components/BranchList/BranchList";
 import BranchMap from "./components/BranchMap/BranchMap";
 
 import { branchApiService } from "./api/BranchApiService";
+import { getCacheKey, getCachedData, setCachedData } from "./utils/cache";
 
 const FILTER_PARAM_MAP = {
   "ATM": { facility: "ATM" },
@@ -23,6 +24,8 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const [activeFilter, setActiveFilter] = useState("All");
 
+  const abortControllerRef = useRef(null);
+
   useEffect(() => {
     const timer = setTimeout(() => setSearch(searchInput), 300);
     return () => clearTimeout(timer);
@@ -36,11 +39,32 @@ export default function App() {
 
         const filterParam = FILTER_PARAM_MAP[activeFilter] ?? {};
         const params = { search, pageSize: 60, ...filterParam };
+        const cacheKey = getCacheKey("getBranches", params);
 
-        const data = await branchApiService.getBranches(params);
+        // Check cache first
+        const cachedData = getCachedData(cacheKey);
+        if (cachedData) {
+          setBranches(cachedData.branches);
+          setLoading(false);
+          return;
+        }
 
+        // Cancel previous request
+        if (abortControllerRef.current) {
+          abortControllerRef.current.abort();
+        }
+        abortControllerRef.current = new AbortController();
+
+        const data = await branchApiService.getBranches(params, {
+          signal: abortControllerRef.current.signal,
+        });
+
+        setCachedData(cacheKey, data);
         setBranches(data.branches);
       } catch (error) {
+        if (error.name === "AbortError") {
+          return;
+        }
         console.error("Error loading branches:", error);
         setBranches([]);
       } finally {
@@ -56,12 +80,33 @@ export default function App() {
       setLoading(true);
       setSelectedBranch(null);
 
-      const data = await branchApiService.searchNearbyBranches({
-        coordinates,
-      });
+      const cacheKey = getCacheKey("searchNearbyBranches", coordinates);
 
+      // Check cache first
+      const cachedData = getCachedData(cacheKey);
+      if (cachedData) {
+        setBranches(cachedData.branches);
+        setLoading(false);
+        return;
+      }
+
+      // Cancel previous request
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+      abortControllerRef.current = new AbortController();
+
+      const data = await branchApiService.searchNearbyBranches(
+        { coordinates },
+        { signal: abortControllerRef.current.signal }
+      );
+
+      setCachedData(cacheKey, data);
       setBranches(data.branches);
     } catch (error) {
+      if (error.name === "AbortError") {
+        return;
+      }
       console.error("Error loading nearby branches:", error);
       setBranches([]);
     } finally {

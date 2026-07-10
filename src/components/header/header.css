@@ -23,11 +23,11 @@
 .locator-logo-container {
   display: flex;
   align-items: center;
-  margin-bottom: 28px;
+  margin-bottom: 26px;
 }
 
 .locator-logo {
-  height: 100px;
+  height: 64px;
   width: auto;
   object-fit: contain;
 }
@@ -56,14 +56,14 @@
   border-radius: 999px;
   background: rgba(0, 75, 147, 0.1);
   color: var(--capitec-blue);
-  font-size: 30;
+  font-size: 13px;
   font-weight: 700;
 }
 
 .locator-header h1 {
   margin: 0;
   color: var(--capitec-text);
-  font-size: x-large;
+  font-size: clamp(30px, 5vw, 52px);
   line-height: 1.05;
   letter-spacing: -0.04em;
 }
@@ -76,7 +76,6 @@
   line-height: 1.6;
 }
 
-/* Search area */
 .locator-search-card {
   display: flex;
   align-items: flex-end;
@@ -150,7 +149,7 @@
   opacity: 0.7;
 }
 
-/* Tonal toggle filters */
+/* Toggle filters */
 .locator-filter-section {
   margin-top: 30px;
 }
@@ -186,24 +185,22 @@
   gap: 4px;
   width: max-content;
   max-width: 100%;
-  padding: 4px;
-  border-radius: 20px;
-  background: #dceefa;
-  border: 1px solid rgba(0, 75, 147, 0.16);
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.6);
 }
 
 .locator-toggle-button {
   min-width: 145px;
-  min-height: 72px;
-  padding: 13px 16px;
-  border: 1px solid transparent;
-  border-radius: 14px;
-  background: #f4f9ff;
+  min-height: 68px;
+  padding: 12px 14px;
+  border: 1px solid rgba(0, 75, 147, 0.14);
+  border-radius: 12px;
+  background: var(--capitec-light-blue);
   color: var(--capitec-blue);
   cursor: pointer;
-  text-align: left;
-  box-shadow: inset 0 0 0 1px rgba(0, 75, 147, 0.08);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   transition:
     background 0.2s ease,
     color 0.2s ease,
@@ -212,9 +209,19 @@
     transform 0.2s ease;
 }
 
+.locator-toggle-button-left {
+  border-top-left-radius: 18px;
+  border-bottom-left-radius: 18px;
+}
+
+.locator-toggle-button-right {
+  border-top-right-radius: 18px;
+  border-bottom-right-radius: 18px;
+}
+
 .locator-toggle-button:hover {
   background: #ffffff;
-  border-color: rgba(0, 75, 147, 0.22);
+  border-color: rgba(0, 75, 147, 0.28);
   box-shadow: 0 8px 18px rgba(0, 75, 147, 0.12);
   transform: translateY(-1px);
 }
@@ -240,7 +247,7 @@
 
 .locator-toggle-description {
   display: block;
-  margin-top: 6px;
+  margin-top: 5px;
   font-size: 12px;
   font-weight: 600;
   line-height: 1.25;
@@ -257,11 +264,11 @@
   }
 
   .locator-logo {
-    height: 36px;
+    height: 42px;
   }
 
   .locator-logo-container {
-    margin-bottom: 24px;
+    margin-bottom: 22px;
   }
 
   .locator-search-card {
@@ -279,8 +286,8 @@
 
   .locator-toggle-button {
     min-width: 138px;
-    min-height: 66px;
-    padding: 11px 14px;
+    min-height: 64px;
+    padding: 10px 12px;
   }
 
   .locator-toggle-label {

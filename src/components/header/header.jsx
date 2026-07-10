@@ -28,7 +28,11 @@ const FILTER_OPTIONS = [
     description: "ID applications",
     value: "Smart ID Services",
   },
-
+  {
+    label: "Business Banking Centre",
+    description: "Business support",
+    value: "Business Banking Centre",
+  },
 ];
 
 export default function Header({
@@ -44,12 +48,18 @@ export default function Header({
     const value = event.target.value;
 
     setSearchValue(value);
-    onSearch(value);
+
+    if (onSearch) {
+      onSearch(value);
+    }
   }
 
   function handleSearchSubmit(event) {
     event.preventDefault();
-    onSearch(searchValue);
+
+    if (onSearch) {
+      onSearch(searchValue);
+    }
   }
 
   function handleUseLocation() {
@@ -67,7 +77,10 @@ export default function Header({
           longitude: position.coords.longitude,
         };
 
-        onLocationFound(coordinates);
+        if (onLocationFound) {
+          onLocationFound(coordinates);
+        }
+
         setLoadingLocation(false);
       },
       (error) => {
@@ -89,6 +102,7 @@ export default function Header({
         <div className="locator-logo-container">
           <img src={logo} alt="Sentra Bank" className="locator-logo" />
         </div>
+
         <div className="locator-header-copy">
           <span className="locator-eyebrow">Branch locator</span>
 
@@ -108,7 +122,7 @@ export default function Header({
                 type="search"
                 value={searchValue}
                 onChange={handleSearchChange}
-                placeholder="Enter your address"
+                placeholder="Search by branch, city, suburb or province"
                 aria-label="Search branches"
               />
             </div>
@@ -145,7 +159,11 @@ export default function Header({
                         ? "locator-toggle-button-right"
                         : ""
                     }`}
-                    onClick={() => onFilterChange(filter.value)}
+                    onClick={() => {
+                      if (onFilterChange) {
+                        onFilterChange(filter.value);
+                      }
+                    }}
                     aria-pressed={isActive}
                   >
                     <span className="locator-toggle-label">
