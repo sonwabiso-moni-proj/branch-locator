@@ -149,6 +149,21 @@ The mock is powered by [MSW](https://mswjs.io/) and runs entirely in the browser
 
 To simulate API errors during development, append `?simulateError=400`, `?simulateError=500`, or `?simulateError=404` to any request URL.
 
+## Manual Testing
+
+### Quick Test Checklist
+
+After running `npm run dev`, verify:
+
+- [ ] **Page loads** — Sentra Bank logo visible, search bar, filter tabs, map, and empty branch list all display
+- [ ] **Search works** — Type a branch name, city, suburb, or province and press Enter; results appear in the list and map updates with markers
+- [ ] **Filters work** — Click "ATM", "Cash ATM", "Smart ID", or "Business Banking" tabs; branch list and map markers update to show only matching branches
+- [ ] **Use my location** — Click the location button; browser prompts for permission; nearby branches display sorted by distance
+- [ ] **Branch cards** — Each branch card shows name, address, province, rating, and open/closed status
+- [ ] **Card-to-map sync** — Click a branch card; map centers on and highlights that branch
+- [ ] **Marker-to-card sync** — Click a map marker; popup shows branch details; corresponding card highlights in the list
+- [ ] **Loading/empty states** — App handles loading states gracefully; empty results display correctly
+
 ## Directions
 
 Users can click any branch marker on the map to view full details and click the **"Get Directions"** button. This opens [OpenStreetMap's routing service](https://www.openstreetmap.org/directions) in a new tab with the branch location as the destination. Users can enter their starting point on OpenStreetMap to see the route.
