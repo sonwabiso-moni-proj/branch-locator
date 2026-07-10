@@ -77,3 +77,26 @@
   color: var(--text-light);
   font-style: italic;
 }
+
+.popup-directions-button {
+  width: 100%;
+  margin-top: 16px;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 6px;
+  background: #004b93;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.popup-directions-button:hover {
+  background: #003a70;
+  box-shadow: 0 4px 12px rgba(0, 75, 147, 0.2);
+}
+
+.popup-directions-button:active {
+  transform: scale(0.98);
+}

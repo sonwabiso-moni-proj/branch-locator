@@ -56,14 +56,14 @@
   border-radius: 999px;
   background: rgba(0, 75, 147, 0.1);
   color: var(--capitec-blue);
-  font-size: 13px;
+  font-size: 30;
   font-weight: 700;
 }
 
 .locator-header h1 {
   margin: 0;
   color: var(--capitec-text);
-  font-size: clamp(30px, 5vw, 52px);
+  font-size: x-large;
   line-height: 1.05;
   letter-spacing: -0.04em;
 }

@@ -8,7 +8,7 @@ A React web application that lets users find Sentra Bank branches and ATMs acros
 - **Search** — filter branches by name, suburb, city, or province
 - **Filter tabs** — quickly narrow results by ATM, Cash Accepting ATM, Smart ID Services, or Business Banking Centre
 - **"Near me" location** — uses the browser Geolocation API to find the closest branches sorted by distance
-- **Branch list** — scrollable sidebar with open/closed status and ratings
+- **Branch list** — scrollable sidebar with open/closed status and address
 - **Mock API** — built-in MSW (Mock Service Worker) mock so the app runs fully offline without a real backend
 
 ## Tech stack

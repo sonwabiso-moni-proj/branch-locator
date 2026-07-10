@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Marker, Popup } from "react-leaflet";
 
 import { branchApiService } from "../../api/BranchApiService";
+import { getOpenStreetMapDirectionsUrl } from "../../utils/directions";
 import "./branchMarker.css";
 
 export default function BranchMarker({
@@ -163,6 +164,19 @@ export default function BranchMarker({
                 ))}
               </div>
             </div>
+
+            <button
+              className="popup-directions-button"
+              onClick={() => {
+                const url = getOpenStreetMapDirectionsUrl(
+                  branchDetails.coordinates.latitude,
+                  branchDetails.coordinates.longitude
+                );
+                window.open(url, "_blank");
+              }}
+            >
+              Get Directions
+            </button>
           </>
         )}
       </Popup>
