@@ -1,6 +1,6 @@
-# Capitec Branch Locator
+# Sentra Branch Locator
 
-A React web application that lets users find Capitec Bank branches and ATMs across South Africa. Users can search by name or location, filter by facility or service type, and view results on an interactive map alongside a scrollable branch list.
+A React web application that lets users find Sentra Bank branches and ATMs across South Africa. Users can search by name or location, filter by facility or service type, and view results on an interactive map alongside a scrollable branch list.
 
 ## Features
 
