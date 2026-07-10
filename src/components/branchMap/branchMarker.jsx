@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 import { Marker, Popup } from "react-leaflet";
 
 import { branchApiService } from "../../api/BranchApiService";
@@ -157,10 +157,10 @@ export default function BranchMarker({
               <span className="popup-label">Opening Hours</span>
               <div className="popup-hours">
                 {Object.entries(branchDetails.operatingHours).map(([day, hours]) => (
-                  <>
-                    <span key={`${day}-day`} className="popup-hours-day">{day}</span>
-                    <span key={`${day}-hours`} className="popup-hours-time">{hours}</span>
-                  </>
+                  <Fragment key={day}>
+                    <span className="popup-hours-day">{day}</span>
+                    <span className="popup-hours-time">{hours}</span>
+                  </Fragment>
                 ))}
               </div>
             </div>
