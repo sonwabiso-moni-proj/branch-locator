@@ -12,9 +12,6 @@ export class HttpService {
 
     const response = await fetch(requestUrl, {
       method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
     });
 
     if (!response.ok) {
@@ -24,11 +21,12 @@ export class HttpService {
     return response.json();
   }
 
-  async post(url, body = {}) {
+  async post(url, body = {}, options = {}) {
     const response = await fetch(url, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        ...options.headers,
       },
       body: JSON.stringify(body),
     });

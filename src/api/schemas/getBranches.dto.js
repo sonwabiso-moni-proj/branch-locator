@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { CoordinatesSchema } from "./common.schema";
+import { CoordinatesSchema } from "./branchShared.dto";
 
 /*
 |--------------------------------------------------------------------------
@@ -40,9 +40,17 @@ export const BranchSummarySchema = z.object({
 
   name: z.string(),
 
+  province: z.string(),
+
+  address: z.string(),
+
   coordinates: CoordinatesSchema,
 
+  rating: z.number().nullable(),
+
   isOpen: z.boolean(),
+
+  distance: z.number().optional(),
 });
 
 export const GetBranchesResponseSchema = z.object({

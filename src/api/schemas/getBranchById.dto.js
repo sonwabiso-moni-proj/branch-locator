@@ -6,7 +6,7 @@ import {
   ContactSchema,
   CoordinatesSchema,
   OperatingHoursSchema,
-} from "./common.schema";
+} from "./branchShared.dto";
 
 /*
 |--------------------------------------------------------------------------

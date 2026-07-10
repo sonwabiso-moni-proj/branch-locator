@@ -103,12 +103,8 @@ export default function BranchList({
               </div>
 
               <div className="branch-card-footer">
-                <span className="branch-rating">
-                  ⭐ {branch.rating ?? "-"}
-                </span>
-
                 <span className="branch-view-map">
-                  View on map
+                  View on map →
                 </span>
               </div>
             </article>

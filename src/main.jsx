@@ -7,10 +7,8 @@ import { USE_MOCK_SERVICE } from "./config/env";
 import "leaflet/dist/leaflet.css";
 import "leaflet-defaulticon-compatibility";
 import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css";
-import "leaflet/dist/leaflet.css";
 import "leaflet.markercluster/dist/MarkerCluster.css";
 import "leaflet.markercluster/dist/MarkerCluster.Default.css";
-
 
 async function enableMocking() {
   if (!USE_MOCK_SERVICE) {
@@ -20,7 +18,7 @@ async function enableMocking() {
 
   console.log("🟡 USING MOCK SERVICE (Branch Locator)");
 
-const { worker } = await import("./api/service/mock/branchLocatorService");
+  const { worker } = await import("./api/service/mock/branchLocatorService");
   await worker.start({
     onUnhandledRequest: "warn",
   });

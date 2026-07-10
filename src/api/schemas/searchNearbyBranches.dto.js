@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { BranchSummarySchema } from "./getBranches.schema";
+import { BranchSummarySchema } from "./getBranches.dto";
 
 export const SearchNearbyBranchesRequestSchema = z.object({
   coordinates: z.object({

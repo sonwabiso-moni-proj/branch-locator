@@ -30,24 +30,31 @@
 .branch-map .leaflet-control-attribution {
     font-size: 11px;
 }
+/* Neutralise the default leaflet-div-icon wrapper so it doesn't bleed white */
+.branch-map .leaflet-div-icon {
+    background: transparent;
+    border: none;
+}
+
 .branch-cluster {
     width: 44px;
     height: 44px;
     border-radius: 50%;
     background: #00a651;
-    border: 4px solid white;
+    border: 3px solid #ffffff;
 
     display: flex;
     align-items: center;
     justify-content: center;
 
-    color: white;
-    font-size: 16px;
-    font-weight: bold;
+    color: #ffffff;
+    font-size: 15px;
+    font-weight: 700;
 
-    box-shadow: 0 4px 10px rgba(0,0,0,.25);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .branch-cluster span {
     line-height: 1;
+    color: #ffffff;
 }

@@ -3,8 +3,6 @@ import { setupWorker } from "msw/browser";
 
 import { API_PATHS } from "../../constants/api-paths";
 
-console.info("🟡 USING MOCK SERVICE (Branch Locator)");
-
 const DEFAULT_OPERATING_HOURS = {
   monday: "08:00-17:00",
   tuesday: "08:00-17:00",

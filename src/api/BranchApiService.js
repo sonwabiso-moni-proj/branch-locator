@@ -4,17 +4,17 @@ import { API_PATHS } from "./constants/api-paths";
 import {
   GetBranchesRequestSchema,
   GetBranchesResponseSchema,
-} from "./schemas/getBranches.schema";
+} from "./schemas/getBranches.dto";
 
 import {
   GetBranchByIdParamsSchema,
   GetBranchByIdResponseSchema,
-} from "./schemas/getBranchById.schema";
+} from "./schemas/getBranchById.dto";
 
 import {
   SearchNearbyBranchesRequestSchema,
   SearchNearbyBranchesResponseSchema,
-} from "./schemas/searchNearbyBranches.schema";
+} from "./schemas/searchNearbyBranches.dto";
 
 export class BranchApiService extends HttpService {
   async getBranches(searchParams = {}, opts) {

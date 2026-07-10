@@ -43,18 +43,12 @@ export default function Header({
     const value = event.target.value;
 
     setSearchValue(value);
-
-    if (onSearch) {
-      onSearch(value);
-    }
+    onSearch(value);
   }
 
   function handleSearchSubmit(event) {
     event.preventDefault();
-
-    if (onSearch) {
-      onSearch(searchValue);
-    }
+    onSearch(searchValue);
   }
 
   function handleUseLocation() {
@@ -72,10 +66,7 @@ export default function Header({
           longitude: position.coords.longitude,
         };
 
-        if (onLocationFound) {
-          onLocationFound(coordinates);
-        }
-
+        onLocationFound(coordinates);
         setLoadingLocation(false);
       },
       (error) => {
@@ -150,11 +141,7 @@ export default function Header({
                         ? "locator-toggle-button-right"
                         : ""
                     }`}
-                    onClick={() => {
-                      if (onFilterChange) {
-                        onFilterChange(filter.value);
-                      }
-                    }}
+                    onClick={() => onFilterChange(filter.value)}
                     aria-pressed={isActive}
                   >
                     <span className="locator-toggle-label">

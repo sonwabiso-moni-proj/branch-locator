@@ -8,7 +8,15 @@ import BranchMap from "./components/BranchMap/BranchMap";
 
 import { branchApiService } from "./api/BranchApiService";
 
+const FILTER_PARAM_MAP = {
+  "ATM": { facility: "ATM" },
+  "Cash Accepting ATM": { facility: "Cash Accepting ATM" },
+  "Smart ID Services": { service: "Smart ID Services" },
+  "Business Banking Centre": { service: "Business Banking Centre" },
+};
+
 export default function App() {
+  const [searchInput, setSearchInput] = useState("");
   const [search, setSearch] = useState("");
   const [branches, setBranches] = useState([]);
   const [selectedBranch, setSelectedBranch] = useState(null);
@@ -16,34 +24,18 @@ export default function App() {
   const [activeFilter, setActiveFilter] = useState("All");
 
   useEffect(() => {
+    const timer = setTimeout(() => setSearch(searchInput), 300);
+    return () => clearTimeout(timer);
+  }, [searchInput]);
+
+  useEffect(() => {
     async function loadBranches() {
       try {
         setLoading(true);
-
-        // When the user searches or changes filter,
-        // reset the selected branch so the map does not stay on an old branch.
         setSelectedBranch(null);
 
-        const params = {
-          search,
-          pageSize: 60,
-        };
-
-        if (activeFilter === "ATM") {
-          params.facility = "ATM";
-        }
-
-        if (activeFilter === "Cash Accepting ATM") {
-          params.facility = "Cash Accepting ATM";
-        }
-
-        if (activeFilter === "Smart ID Services") {
-          params.service = "Smart ID Services";
-        }
-
-        if (activeFilter === "Business Banking Centre") {
-          params.service = "Business Banking Centre";
-        }
+        const filterParam = FILTER_PARAM_MAP[activeFilter] ?? {};
+        const params = { search, pageSize: 60, ...filterParam };
 
         const data = await branchApiService.getBranches(params);
 
@@ -62,7 +54,6 @@ export default function App() {
   async function handleLocationFound(coordinates) {
     try {
       setLoading(true);
-
       setSelectedBranch(null);
 
       const data = await branchApiService.searchNearbyBranches({
@@ -78,14 +69,10 @@ export default function App() {
     }
   }
 
-  function handleBranchSelect(branch) {
-    setSelectedBranch(branch);
-  }
-
   return (
     <div className="app">
       <Header
-        onSearch={setSearch}
+        onSearch={setSearchInput}
         onLocationFound={handleLocationFound}
         activeFilter={activeFilter}
         onFilterChange={setActiveFilter}
@@ -97,14 +84,14 @@ export default function App() {
             branches={branches}
             loading={loading}
             selectedBranch={selectedBranch}
-            onBranchSelect={handleBranchSelect}
+            onBranchSelect={setSelectedBranch}
           />
 
           <div className="map-card">
             <BranchMap
               branches={branches}
               selectedBranch={selectedBranch}
-              onBranchSelect={handleBranchSelect}
+              onBranchSelect={setSelectedBranch}
             />
           </div>
         </div>
